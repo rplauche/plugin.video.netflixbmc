@@ -67,12 +67,12 @@ auth = addon.getSetting("auth")
 if len(language.split("-"))>1:
     country = language.split("-")[1]
 
-try:
-    from pycharm_debug import pydevd
-    pydevd.set_pm_excepthook()
-    pydevd.settrace('alelec.local', port=51380, stdoutToServer=True, stderrToServer=True)
-except BaseException as ex:
-    pass
+# try:
+#     from pycharm_debug import pydevd
+#     pydevd.set_pm_excepthook()
+#     pydevd.settrace('alelec.local', port=51380, stdoutToServer=True, stderrToServer=True)
+# except BaseException as ex:
+#     pass
 
 urlMain = "https://www.netflix.com"
 
