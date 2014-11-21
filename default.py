@@ -67,19 +67,14 @@ auth = addon.getSetting("auth")
 if len(language.split("-"))>1:
     country = language.split("-")[1]
 
-# try:
-#     from pycharm_debug import pydevd
-#     pydevd.set_pm_excepthook()
-#     pydevd.settrace('alelec.local', port=51380, stdoutToServer=True, stderrToServer=True)
-# except BaseException as ex:
-#     pass
+try:
+    from pycharm_debug import pydevd
+    pydevd.set_pm_excepthook()
+    pydevd.settrace('alelec.local', port=51380, stdoutToServer=True, stderrToServer=True)
+except BaseException as ex:
+    pass
 
-#cj = cookielib.MozillaCookieJar()
 urlMain = "https://www.netflix.com"
-
-#opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-#userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0"
-#opener.addheaders = [('User-agent', userAgent)]
 
 session = requests.Session()
 session.headers.update({
@@ -481,12 +476,13 @@ def listViewingActivity(type):
 
 def getVideoInfo(videoID):
     cacheFile = os.path.join(cacheFolder, videoID+".cache")
+    content = ""
     if os.path.exists(cacheFile):
         fh = xbmcvfs.File(cacheFile, 'r')
         content = fh.read()
         fh.close()
-    else:
-        content = load(urlMain+"/JSON/BOB?movieid="+videoID)
+    if not content:
+        content = load(urlMain+"/JSON/BOB?movieid="+videoID).encode("utf-8")
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
@@ -495,13 +491,14 @@ def getVideoInfo(videoID):
 
 def getSeriesInfo(seriesID):
     cacheFile = os.path.join(cacheFolder, seriesID+"_episodes.cache")
+    content = ""
     if os.path.exists(cacheFile) and (time.time()-os.path.getmtime(cacheFile) < 60*5):
         fh = xbmcvfs.File(cacheFile, 'r')
         content = fh.read()
         fh.close()
-    else:
+    if not content:
         url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&video="+seriesID+"&country="+country
-        content = load(url)
+        content = load(url).encode("utf-8")
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
