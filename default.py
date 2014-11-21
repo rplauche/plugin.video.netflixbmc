@@ -441,23 +441,21 @@ def listViewingActivity(type):
     content = load(urlMain+"/WiViewingActivity")
     count = 0
     videoIDs = []
-    spl = content.split('<li data-series=')
+    spl = re.compile('(<li .*?data-series=.*?</li>)', re.DOTALL).findall(content)
+    #spl = content.split('')
     for i in range(1, len(spl), 1):
         entry = spl[i]
         pDialog.update((count+1)*100/len(spl), translation(30142)+"...")
-        matchId1 = re.compile('"(.*?)"', re.DOTALL).findall(entry)
-        matchId2 = re.compile('data-movieid="(.*?)"', re.DOTALL).findall(entry)
-        if matchId1[0]:
-            videoID = matchId1[0]
-        elif matchId2[0]:
-            videoID = matchId2[0]
+        matchId = re.compile('data-movieid="(.*?)"', re.DOTALL).findall(entry)
+        if matchId:
+            videoID = matchId[0]
         match = re.compile('class="col date nowrap">(.+?)<', re.DOTALL).findall(entry)
         date = match[0]
         matchTitle1 = re.compile('class="seriestitle">(.+?)</a>', re.DOTALL).findall(entry)
         matchTitle2 = re.compile('class="col title">.+?>(.+?)<', re.DOTALL).findall(entry)
-        if matchId1[0]:
+        if matchTitle1:
             title = matchTitle1[0].replace("&amp;", "&").replace("&quot;", '"').replace("</span>", "")
-        elif matchId2[0]:
+        elif matchTitle2:
             title = matchTitle2[0]
         else:
             title = ""
