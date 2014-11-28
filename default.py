@@ -67,31 +67,44 @@ auth = addon.getSetting("auth")
 if len(language.split("-"))>1:
     country = language.split("-")[1]
 
-# try:
-#     from pycharm_debug import pydevd
-#     pydevd.set_pm_excepthook()
-#     pydevd.settrace('alelec.local', port=51380, stdoutToServer=True, stderrToServer=True)
-# except BaseException as ex:
-#     pass
+trace_on = False
+try:
+    from pycharm_debug import pydevd
+    pydevd.set_pm_excepthook()
+    pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
+    trace_on = True
+except BaseException as ex:
+    pass
 
 urlMain = "https://www.netflix.com"
-
-session = requests.Session()
-session.headers.update({
-    'User-Agent': 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.6 Safari/537.36',
-})
+session = None
+def newSession():
+    s = requests.Session()
+    s.headers.update({
+        'User-Agent': 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.6 Safari/537.36',
+    })
+    return s
+session = newSession()
 
 def load(url, post = None):
-    #return opener.open(url).read()
     r = ""
-    if post:
-        r = session.post(url, data=post).text
-    else:
-        r = session.get(url).text
+    try:
+        if post:
+            r = session.post(url, data=post).text
+        else:
+            r = session.get(url).text
+    except AttributeError:
+        xbmc.executebuiltin('XBMC.Notification(NetfliXBMC Error: Cookies have been deleted. Please try again.,10000,'+icon+')')
+        newSession()
+        saveState()
+        if post:
+            r = session.post(url, data=post).text
+        else:
+            r = session.get(url).text
+
     return r
 
 def saveState():
-    #cj.save(cookieFile)
     tempfile = sessionFile+".tmp"
     if xbmcvfs.exists(tempfile):
         xbmcvfs.delete(tempfile)
@@ -103,6 +116,7 @@ def saveState():
         xbmcvfs.delete(sessionFile)
     xbmcvfs.rename(tempfile, sessionFile)
 
+# Load cached data
 if not os.path.isdir(addonUserDataFolder):
     os.mkdir(addonUserDataFolder)
 if not os.path.isdir(cacheFolder):
@@ -117,8 +131,6 @@ if not os.path.isdir(libraryFolderMovies):
     xbmcvfs.mkdir(libraryFolderMovies)
 if not os.path.isdir(libraryFolderTV):
     xbmcvfs.mkdir(libraryFolderTV)
-#if os.path.exists(cookieFile):
-#    cj.load(cookieFile)
 if os.path.exists(sessionFile):
     fh = xbmcvfs.File(sessionFile, 'rb')
     content = fh.read()
@@ -159,8 +171,6 @@ def main(type):
 
 
 def wiHome(type):
-    if not singleProfile:
-        setProfile()
     content = load(urlMain+"/WiHome")
     match1 = re.compile('<div class="mrow(.+?)"><div class="hd clearfix"><h3> (.+?)</h3></div><div class="bd clearfix"><div class="slider triangleBtns " id="(.+?)"', re.DOTALL).findall(content)
     match2 = re.compile('class="hd clearfix"><h3><a href="(.+?)">(.+?)<', re.DOTALL).findall(content)
@@ -176,8 +186,6 @@ def wiHome(type):
 def listVideos(url, type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
-    if not singleProfile:
-        setProfile()
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(url)
     #content = load(url) # Terrible... currently first call doesn't have the content, it requires two calls....
@@ -229,8 +237,6 @@ def listVideos(url, type):
 def listSliderVideos(sliderID, type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
-    if not singleProfile:
-        setProfile()
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(urlMain+"/WiHome")
     if not 'id="page-LOGIN"' in content:
@@ -268,8 +274,6 @@ def listSliderVideos(sliderID, type):
 def listSearchVideos(url, type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
-    if not singleProfile:
-        setProfile()
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(url)
     content = json.loads(content)
@@ -366,8 +370,6 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
 
 
 def listGenres(type, videoType):
-    if not singleProfile:
-        setProfile()
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
     content = load(urlMain+"/WiHome")
     match = re.compile('/'+type+'\\?agid=(.+?)">(.+?)<', re.DOTALL).findall(content)
@@ -381,8 +383,6 @@ def listGenres(type, videoType):
 
 
 def listTvGenres(videoType):
-    if not singleProfile:
-        setProfile()
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
     content = load(urlMain+"/WiGenre?agid=83")
     content = content[content.find('id="subGenres_menu"'):]
@@ -435,8 +435,6 @@ def listEpisodes(seriesID, season):
 def listViewingActivity(type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
-    if not singleProfile:
-        setProfile()
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(urlMain+"/WiViewingActivity")
     count = 0
@@ -504,8 +502,6 @@ def getSeriesInfo(seriesID):
 
 
 def addMyListToLibrary():
-    if not singleProfile:
-        setProfile()
     content = load(urlMain+"/MyList?leid=595&link=seeall")
     if not 'id="page-LOGIN"' in content:
         if singleProfile and 'id="page-ProfilesGate"' in content:
@@ -691,7 +687,11 @@ def login():
                         }
             #content = load("https://signup.netflix.com/Login", "authURL="+urllib.quote_plus(authUrl)+"&email="+urllib.quote_plus(username)+"&password="+urllib.quote_plus(password)+"&RememberMe=on")
             content = load("https://signup.netflix.com/Login", postdata)
-            match = re.compile('"LOCALE":"(.+?)"', re.DOTALL).findall(content)
+            if 'id="page-LOGIN"' in content:
+                # Login Failed
+                xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30127))+',15000,'+icon+')')
+                return False
+            match = re.compile('["LOCALE","locale"]:"(.+?)"', re.DOTALL).findall(content)
             if match and not addon.getSetting("language"):
                 addon.setSetting("language", match[0])
             saveState()
@@ -703,14 +703,6 @@ def login():
     else:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30126))+',10000,'+icon+')')
         return False
-
-
-def setProfile():
-    #token = addon.getSetting("profile")
-    #load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
-    #load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+token)
-    #saveState()
-    pass
 
 
 def chooseProfile():
@@ -727,8 +719,6 @@ def chooseProfile():
     nr = dialog.select(translation(30113), profiles)
     if nr >= 0:
         token = tokens[nr]
-        # Profile selection isn't remembered, so it has to be executed before every requests (setProfile)
-        # If you know a solution for this, please let me know
         load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+token)
         addon.setSetting("profile", token)
         saveState()
@@ -1068,3 +1058,7 @@ elif mode == 'addSeriesToLibrary':
     addSeriesToLibrary(seriesID, name, url)
 else:
     index()
+
+
+if trace_on:
+    pydevd.stoptrace()
