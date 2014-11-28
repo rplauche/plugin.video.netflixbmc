@@ -68,13 +68,13 @@ if len(language.split("-"))>1:
     country = language.split("-")[1]
 
 trace_on = False
-try:
-    from pycharm_debug import pydevd
-    pydevd.set_pm_excepthook()
-    pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
-    trace_on = True
-except BaseException as ex:
-    pass
+# try:
+#     from pycharm_debug import pydevd
+#     pydevd.set_pm_excepthook()
+#     pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
+#     trace_on = True
+# except BaseException as ex:
+#     pass
 
 urlMain = "https://www.netflix.com"
 session = None
