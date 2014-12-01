@@ -668,7 +668,7 @@ def removeFromQueue(id):
 
 def login():
     content = load(urlMain+"/Login")
-    match = re.compile('"LOCALE":"(.+?)"', re.DOTALL).findall(content)
+    match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
     if match and not addon.getSetting("language"):
         addon.setSetting("language", match[0])
     if not "Sorry, Netflix is not available in your country yet." in content and not "Sorry, Netflix hasn't come to this part of the world yet" in content:
@@ -691,7 +691,7 @@ def login():
                 # Login Failed
                 xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30127))+',15000,'+icon+')')
                 return False
-            match = re.compile('["LOCALE","locale"]:"(.+?)"', re.DOTALL).findall(content)
+            match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
             if match and not addon.getSetting("language"):
                 addon.setSetting("language", match[0])
             saveState()
@@ -1062,3 +1062,4 @@ else:
 
 if trace_on:
     pydevd.stoptrace()
+
