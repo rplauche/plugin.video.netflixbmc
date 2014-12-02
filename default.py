@@ -38,6 +38,7 @@ utilityPath = xbmc.translatePath('special://home/addons/'+addonID+'/resources/Ne
 sendKeysPath = xbmc.translatePath('special://home/addons/'+addonID+'/resources/NetfliXBMC_SendKeys.exe')
 fakeVidPath = xbmc.translatePath('special://home/addons/'+addonID+'/resources/fakeVid.mp4')
 downloadScript = xbmc.translatePath('special://home/addons/'+addonID+'/download.py')
+browserScript = xbmc.translatePath('special://home/addons/'+addonID+'/browser.sh')
 searchHistoryFolder = os.path.join(addonUserDataFolder, "history")
 cacheFolder = os.path.join(addonUserDataFolder, "cache")
 cacheFolderCoversTMDB = os.path.join(cacheFolder, "covers")
@@ -564,10 +565,10 @@ def playVideo(id):
 
 def playVideoMain(id):
     xbmc.Player().stop()
+    token = ""
     if singleProfile:
         url = urlMain+"/WiPlayer?movieid="+id
     else:
-        token = ""
         if addon.getSetting("profile"):
             token = addon.getSetting("profile")
         url = "https://www.netflix.com/SwitchProfile?tkn="+token+"&nextpage="+urllib.quote_plus(urlMain+"/WiPlayer?movieid="+id)
@@ -589,16 +590,16 @@ def playVideoMain(id):
         except:
             pass
     elif osLinux:
-        xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
-        try:
-            xbmc.sleep(5000)
-            subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
-            xbmc.sleep(5000)
-            subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
-            xbmc.sleep(5000)
-            subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
-        except:
-            pass
+        xbmc.executebuiltin('LIRC.Stop')
+        
+        if token != "":
+            call = '"'+browserScript+'" "'+id+'" "'+token+'"';
+        else:
+            call = '"'+browserScript+'" "'+id+'"';
+        
+        subprocess.call(call, shell=True)
+         
+        xbmc.executebuiltin('LIRC.Start')
     elif osWin:
         if winBrowser == 1:
             path = 'C:\\Program Files\\Internet Explorer\\iexplore.exe'
