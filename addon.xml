@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.netflixbmc" name="NetfliXBMC" version="1.3.4" provider-name="AddonScriptorDE (alelec)">
+<addon id="plugin.video.netflixbmc" name="NetfliXBMC" version="1.3.5" provider-name="alelec (AddonScriptorDE)">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
     </requires>
@@ -12,9 +12,9 @@
         <language></language>
         <description lang="en">NetfliXBMC - Unofficial Netflix Add-on (Win/OSX/Linux)</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
-        <source>https://github.com/AddonScriptorDE/plugin.video.netflixbmc</source>
+        <source>https://github.com/andrewleech/plugin.video.netflixbmc</source>
         <forum>http://forum.xbmc.org/showthread.php?tid=178693</forum>
-        <email>AddonScriptorDE at yahoo dot de</email>
+        <email>andrew@alelec.net</email>
         <website>http://www.netflix.com</website>
     </extension>
 </addon>
