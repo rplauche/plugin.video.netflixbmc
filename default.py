@@ -17,6 +17,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 import traceback
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -103,7 +104,7 @@ def load(url, post = None):
         else:
             r = session.get(url).text
 
-    return r
+    return r.encode('utf-8')
 
 def saveState():
     tempfile = sessionFile+".tmp"
@@ -479,7 +480,7 @@ def getVideoInfo(videoID):
         content = fh.read()
         fh.close()
     if not content:
-        content = load(urlMain+"/JSON/BOB?movieid="+videoID).encode("utf-8")
+        content = load(urlMain+"/JSON/BOB?movieid="+videoID)
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
@@ -495,7 +496,7 @@ def getSeriesInfo(seriesID):
         fh.close()
     if not content:
         url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&seriesId="+seriesID+"&country="+country
-        content = load(url).encode("utf-8")
+        content = load(url)
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
@@ -802,8 +803,10 @@ def parameters_string_to_dict(parameters):
 
 
 def addDir(name, url, mode, iconimage, type=""):
+    name = name.replace("&amp;", "&").replace("&#39;", "'")
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&type="+str(type)+"&thumb="+urllib.quote_plus(iconimage)
     ok = True
+
     liz = xbmcgui.ListItem(name, iconImage="DefaultTVShows.png", thumbnailImage=iconimage)
     liz.setInfo(type="video", infoLabels={"title": name})
     entries = []
