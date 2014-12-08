@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import HTMLParser
 import urllib
 import requests
 import socket
@@ -26,6 +27,7 @@ except ImportError:
 socket.setdefaulttimeout(40)
 pluginhandle = int(sys.argv[1])
 
+htmlParser = HTMLParser.HTMLParser()
 addon = xbmcaddon.Addon()
 addonID = addon.getAddonInfo('id')
 osWin = xbmc.getCondVisibility('system.platform.windows')
@@ -342,7 +344,7 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     match = re.compile('src=".+?">.*?<.*?>(.+?)<', re.DOTALL).findall(videoDetails)
     desc = ""
     if match:
-        desc = match[0].replace("&amp;", "&")
+        desc = htmlParser.unescape(match[0])
     match = re.compile('Director:</dt><dd>(.+?)<', re.DOTALL).findall(videoDetails)
     director = ""
     if match:
@@ -355,7 +357,7 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     rating = ""
     if rating:
         rating = match[0]
-    title = title.replace("&amp;", "&")
+    title = htmlParser.unescape(title)
     nextMode = "playVideoMain"
     if browseTvShows and videoType == "tvshow":
         nextMode = "listSeasons"
@@ -454,7 +456,7 @@ def listViewingActivity(type):
         matchTitle1 = re.compile('class="seriestitle">(.+?)</a>', re.DOTALL).findall(entry)
         matchTitle2 = re.compile('class="col title">.+?>(.+?)<', re.DOTALL).findall(entry)
         if matchTitle1:
-            title = matchTitle1[0].replace("&amp;", "&").replace("&quot;", '"').replace("</span>", "")
+            title = htmlParser.unescape(matchTitle1[0]).replace("</span>", "")
         elif matchTitle2:
             title = matchTitle2[0]
         else:
@@ -495,7 +497,8 @@ def getSeriesInfo(seriesID):
         content = fh.read()
         fh.close()
     if not content:
-        url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&seriesId="+seriesID+"&country="+country
+        #url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&seriesId="+seriesID+"&country="+country
+        url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&video="+seriesID+"&country="+country
         content = load(url)
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
@@ -531,7 +534,7 @@ def addMyListToLibrary():
                 videoDetails = getVideoInfo(videoID)
                 match = re.compile('<span class="title ".*?>(.+?)<\/span>', re.DOTALL).findall(videoDetails)
                 title = match[0].strip()
-                title = title.replace("&amp;", "&")
+                title = htmlParser.unescape(title)
                 match = re.compile('<span class="year".*?>(.+?)<\/span>', re.DOTALL).findall(videoDetails)
                 year = ""
                 if match:
@@ -803,7 +806,7 @@ def parameters_string_to_dict(parameters):
 
 
 def addDir(name, url, mode, iconimage, type=""):
-    name = name.replace("&amp;", "&").replace("&#39;", "'")
+    name = htmlParser.unescape(name)
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&type="+str(type)+"&thumb="+urllib.quote_plus(iconimage)
     ok = True
 
