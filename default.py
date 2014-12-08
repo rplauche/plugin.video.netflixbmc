@@ -100,17 +100,17 @@ def load(url, post = None):
     r = ""
     try:
         if post:
-            r = session.post(url, data=post).text
+            r = session.post(url, data=post, verify=False).text
         else:
-            r = session.get(url).text
+            r = session.get(url, verify=False).text
     except AttributeError:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC Error: Cookies have been deleted. Please try again.,10000,'+icon+')')
         newSession()
         saveState()
         if post:
-            r = session.post(url, data=post).text
+            r = session.post(url, data=post, verify=False).text
         else:
-            r = session.get(url).text
+            r = session.get(url, verify=False).text
 
     return r.encode('utf-8')
 
