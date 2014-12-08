@@ -647,6 +647,9 @@ def deleteCookies():
     if os.path.exists(cookieFile):
         os.remove(cookieFile)
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,Cookies have been deleted!,5000,'+icon+')')
+    if os.path.exists(sessionFile):
+        os.remove(sessionFile)
+        xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,Session cookies have been deleted!,5000,'+icon+')')
 
 
 def deleteCache():
