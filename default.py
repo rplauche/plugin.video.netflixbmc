@@ -68,6 +68,9 @@ viewIdActivity = addon.getSetting("viewIdActivity")
 winBrowser = int(addon.getSetting("winBrowserNew"))
 language = addon.getSetting("language")
 auth = addon.getSetting("auth")
+linuxUseShellScript = addon.getSetting("linuxUseShellScript") == "true"
+debug = addon.getSetting("debug") == "true"
+
 if len(language.split("-"))>1:
     country = language.split("-")[1]
 
@@ -91,6 +94,9 @@ def newSession():
 session = newSession()
 
 def load(url, post = None):
+    if debug:
+        print "URL: " + url
+
     r = ""
     try:
         if post:
@@ -464,7 +470,9 @@ def listViewingActivity(type):
         title = date+" - "+title
         if videoID not in videoIDs:
             videoIDs.append(videoID)
-            added = listVideo(videoID, title, "", False, False, type)
+            # due to limitations in the netflix api, there is no way to get the seriesId of an
+            # episode, so the 4 param is set to True to treat tv episodes the same as movies.
+            added = listVideo(videoID, title, "", True, False, type)
             if added:
                 count += 1
             if count == 40:
@@ -497,7 +505,6 @@ def getSeriesInfo(seriesID):
         content = fh.read()
         fh.close()
     if not content:
-        #url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&seriesId="+seriesID+"&country="+country
         url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&video="+seriesID+"&country="+country
         content = load(url).encode("utf-8")
         fh = xbmcvfs.File(cacheFile, 'w')
@@ -569,10 +576,10 @@ def playVideo(id):
 
 def playVideoMain(id):
     xbmc.Player().stop()
-    token = ""
     if singleProfile:
         url = urlMain+"/WiPlayer?movieid="+id
     else:
+        token = ""
         if addon.getSetting("profile"):
             token = addon.getSetting("profile")
         url = "https://www.netflix.com/SwitchProfile?tkn="+token+"&nextpage="+urllib.quote_plus(urlMain+"/WiPlayer?movieid="+id)
@@ -594,16 +601,26 @@ def playVideoMain(id):
         except:
             pass
     elif osLinux:
-        xbmc.executebuiltin('LIRC.Stop')
-        
-        if token != "":
-            call = '"'+browserScript+'" "'+id+'" "'+token+'"';
+        if linuxUseShellScript:
+            xbmc.executebuiltin('LIRC.Stop')
+            
+            call = '"'+browserScript+'" "'+url+'"';
+            if debug:
+                print "Browser Call: " + call
+            subprocess.call(call, shell=True)
+            
+            xbmc.executebuiltin('LIRC.Start')
         else:
-            call = '"'+browserScript+'" "'+id+'"';
-        
-        subprocess.call(call, shell=True)
-         
-        xbmc.executebuiltin('LIRC.Start')
+            xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
+            try:
+                xbmc.sleep(5000)
+                subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
+                xbmc.sleep(5000)
+                subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
+                xbmc.sleep(5000)
+                subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
+            except:
+                pass
     elif osWin:
         if winBrowser == 1:
             path = 'C:\\Program Files\\Internet Explorer\\iexplore.exe'

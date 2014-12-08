@@ -19,11 +19,7 @@ fi
 # http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ $# -eq 2 ]; then
-	url="https://www.netflix.com/SwitchProfile?tkn=$2&nextpage=https%3A%2F%2Fwww.netflix.com%2FWiPlayer%3Fmovieid%3D$1"
-else
-	url="http://www.netflix.com/WiPlayer?movieid=$1"
-fi
+url=$1
 
 # notice the ampersand to send google chrome into back ground so that the script continues and we execute the xdotool below
 /usr/bin/google-chrome --start-maximized --disable-translate --disable-new-tab-first-run --no-default-browser-check --no-first-run --kiosk "$url" &
