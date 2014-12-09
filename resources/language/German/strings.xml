@@ -14,10 +14,10 @@
   <string id="30101">eMail</string>
   <string id="30102">Passwort</string>
   <string id="30103">Account mit nur einem Nutzerprofil (schneller)</string>
-  <string id="30104">Windows: Browser</string>
+  <string id="30104">Browser</string>
   <string id="30105">OSX: Browser</string>
   <string id="30106">Linux: Browser</string>
-  <string id="30107">Windows: Control Utitlity nutzen</string>
+  <string id="30107">Control Utitlity nutzen</string>
   <string id="30108">View erzwingen</string>
   <string id="30109">ViewID (Videos)</string>
   <string id="30110">Profil wechseln</string>
@@ -55,4 +55,13 @@
   <string id="30202">Allgemein</string>
   <string id="30203">Views</string>
   <string id="30204">Erweitert</string>
+
+  <!--Appologies for any translation problems, below was done with google-->
+  <string id="30205">Debugprotokollierung</string>
+  <string id="30206">Verwenden Sie Browser Shell Script</string>
+  <string id="30207">Windows Einstellungen</string>
+  <string id="30208">Linux Einstellungen</string>
+  <string id="30209">OSX Einstellungen</string>
+  <string id="30210">Browser Einstellungen</string>
+  <string id="30211">Reset</string>
 </strings>
