@@ -506,7 +506,7 @@ def getSeriesInfo(seriesID):
         fh.close()
     if not content:
         url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&video="+seriesID+"&country="+country
-        content = load(url).encode("utf-8")
+        content = load(url)
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
