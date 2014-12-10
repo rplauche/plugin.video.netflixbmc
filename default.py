@@ -68,6 +68,9 @@ viewIdActivity = addon.getSetting("viewIdActivity")
 winBrowser = int(addon.getSetting("winBrowserNew"))
 language = addon.getSetting("language")
 auth = addon.getSetting("auth")
+linuxUseShellScript = addon.getSetting("linuxUseShellScript") == "true"
+debug = addon.getSetting("debug") == "true"
+
 if len(language.split("-"))>1:
     country = language.split("-")[1]
 
@@ -91,20 +94,23 @@ def newSession():
 session = newSession()
 
 def load(url, post = None):
+    if debug:
+        print "URL: " + url
+
     r = ""
     try:
         if post:
-            r = session.post(url, data=post).text
+            r = session.post(url, data=post, verify=False).text
         else:
-            r = session.get(url).text
+            r = session.get(url, verify=False).text
     except AttributeError:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC Error: Cookies have been deleted. Please try again.,10000,'+icon+')')
         newSession()
         saveState()
         if post:
-            r = session.post(url, data=post).text
+            r = session.post(url, data=post, verify=False).text
         else:
-            r = session.get(url).text
+            r = session.get(url, verify=False).text
 
     return r.encode('utf-8')
 
@@ -464,7 +470,9 @@ def listViewingActivity(type):
         title = date+" - "+title
         if videoID not in videoIDs:
             videoIDs.append(videoID)
-            added = listVideo(videoID, title, "", False, False, type)
+            # due to limitations in the netflix api, there is no way to get the seriesId of an
+            # episode, so the 4 param is set to True to treat tv episodes the same as movies.
+            added = listVideo(videoID, title, "", True, False, type)
             if added:
                 count += 1
             if count == 40:
@@ -497,9 +505,8 @@ def getSeriesInfo(seriesID):
         content = fh.read()
         fh.close()
     if not content:
-        #url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&seriesId="+seriesID+"&country="+country
         url = "http://api-global.netflix.com/desktop/odp/episodes?languages="+language+"&forceEpisodes=true&routing=redirect&video="+seriesID+"&country="+country
-        content = load(url)
+        content = load(url).encode("utf-8")
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
@@ -569,10 +576,10 @@ def playVideo(id):
 
 def playVideoMain(id):
     xbmc.Player().stop()
-    token = ""
     if singleProfile:
         url = urlMain+"/WiPlayer?movieid="+id
     else:
+        token = ""
         if addon.getSetting("profile"):
             token = addon.getSetting("profile")
         url = "https://www.netflix.com/SwitchProfile?tkn="+token+"&nextpage="+urllib.quote_plus(urlMain+"/WiPlayer?movieid="+id)
@@ -594,16 +601,26 @@ def playVideoMain(id):
         except:
             pass
     elif osLinux:
-        xbmc.executebuiltin('LIRC.Stop')
-        
-        if token != "":
-            call = '"'+browserScript+'" "'+id+'" "'+token+'"';
+        if linuxUseShellScript:
+            xbmc.executebuiltin('LIRC.Stop')
+            
+            call = '"'+browserScript+'" "'+url+'"';
+            if debug:
+                print "Browser Call: " + call
+            subprocess.call(call, shell=True)
+            
+            xbmc.executebuiltin('LIRC.Start')
         else:
-            call = '"'+browserScript+'" "'+id+'"';
-        
-        subprocess.call(call, shell=True)
-         
-        xbmc.executebuiltin('LIRC.Start')
+            xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
+            try:
+                xbmc.sleep(5000)
+                subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
+                xbmc.sleep(5000)
+                subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
+                xbmc.sleep(5000)
+                subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
+            except:
+                pass
     elif osWin:
         if winBrowser == 1:
             path = 'C:\\Program Files\\Internet Explorer\\iexplore.exe'
@@ -630,6 +647,9 @@ def deleteCookies():
     if os.path.exists(cookieFile):
         os.remove(cookieFile)
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,Cookies have been deleted!,5000,'+icon+')')
+    if os.path.exists(sessionFile):
+        os.remove(sessionFile)
+        xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,Session cookies have been deleted!,5000,'+icon+')')
 
 
 def deleteCache():

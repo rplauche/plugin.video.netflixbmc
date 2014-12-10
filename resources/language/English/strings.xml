@@ -14,10 +14,10 @@
   <string id="30101">eMail</string>
   <string id="30102">Password</string>
   <string id="30103">Single-User account (faster)</string>
-  <string id="30104">Windows: Browser</string>
+  <string id="30104">Use Browser</string>
   <string id="30105">OSX: Browser</string>
   <string id="30106">Linux: Browser</string>
-  <string id="30107">Windows: Use Control Utitlity</string>
+  <string id="30107">Use Control Utitlity</string>
   <string id="30108">Force View</string>
   <string id="30109">ViewID (Videos)</string>
   <string id="30110">Switch profile</string>
@@ -56,4 +56,11 @@
   <string id="30202">General</string>
   <string id="30203">Views</string>
   <string id="30204">Advanced</string>
+  <string id="30205">Debug Logging</string>
+  <string id="30206">Use Browser Shell Script</string>
+  <string id="30207">Windows Settings</string>
+  <string id="30208">Linux Settings</string>
+  <string id="30209">OSX Settings</string>
+  <string id="30210">Browser Settings</string>
+  <string id="30211">Reset</string>
 </strings>
