@@ -57,6 +57,7 @@ singleProfile = addon.getSetting("singleProfile") == "true"
 showProfiles = addon.getSetting("showProfiles") == "true"
 forceView = addon.getSetting("forceView") == "true"
 useUtility = addon.getSetting("useUtility") == "true"
+useChromeProfile = addon.getSetting("useChromeProfile") == "true"
 remoteControl = addon.getSetting("remoteControl") == "true"
 updateDB = addon.getSetting("updateDB") == "true"
 useTMDb = addon.getSetting("useTMDb") == "true"
@@ -75,13 +76,14 @@ if len(language.split("-"))>1:
     country = language.split("-")[1]
 
 trace_on = False
-# try:
-#     from pycharm_debug import pydevd
-#     pydevd.set_pm_excepthook()
-#     pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
-#     trace_on = True
-# except BaseException as ex:
-#     pass
+try:
+    pass
+    # import pydevd
+    # #pydevd.set_pm_excepthook()
+    # pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
+    # trace_on = True
+except BaseException as ex:
+    pass
 
 urlMain = "https://www.netflix.com"
 session = None
@@ -583,11 +585,9 @@ def playVideoMain(id):
         if addon.getSetting("profile"):
             token = addon.getSetting("profile")
         url = "https://www.netflix.com/SwitchProfile?tkn="+token+"&nextpage="+urllib.quote_plus(urlMain+"/WiPlayer?movieid="+id)
-    kiosk = "yes"
-    if dontUseKiosk:
-        kiosk = "no"
     if osOSX:
-        xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
+        launchChrome(url)
+        #xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
         try:
             xbmc.sleep(5000)
             subprocess.Popen('cliclick c:500,500', shell=True)
@@ -611,7 +611,8 @@ def playVideoMain(id):
             
             xbmc.executebuiltin('LIRC.Start')
         else:
-            xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
+            launchChrome(url)
+            #xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
             try:
                 xbmc.sleep(5000)
                 subprocess.Popen('xdotool mousemove 9999 9999', shell=True)
@@ -630,18 +631,39 @@ def playVideoMain(id):
             elif os.path.exists(path64):
                 subprocess.Popen('"'+path64+'" -k "'+url+'"', shell=False)
         else:
-            xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
+            launchChrome(url)
+            #xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
         if useUtility:
             subprocess.Popen('"'+utilityPath+'"', shell=False)
     if remoteControl:
         myWindow = window('window.xml', addon.getAddonInfo('path'), 'default',)
         myWindow.doModal()
 
+def launchChrome(url):
+    kiosk = "yes"
+    if dontUseKiosk:
+        kiosk = "no"
+
+    profileFolder = ""
+    if useChromeProfile:
+        userdir = os.path.join(addonUserDataFolder, "chrome-user-data")
+        if not os.path.exists(userdir):
+            import zipfile
+            zip = os.path.join(addonDir, "resources", "chrome-user-data.zip")
+            with open(zip, "r") as zf:
+                z = zipfile.ZipFile(zf)
+                z.extractall(addonUserDataFolder)
+        profileFolder = "&profileFolder="+urllib.quote_plus(userdir)
+
+    xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+profileFolder+")")
 
 def configureUtility():
     if osWin:
         subprocess.Popen('"'+utilityPath+'"'+' config=yes', shell=False)
 
+def chromePluginOptions():
+    url = "chrome-extension://najegmllpphoobggcngjhcpknknljhkj/html/options.html"
+    launchChrome(url)
 
 def deleteCookies():
     if os.path.exists(cookieFile):
@@ -1069,6 +1091,8 @@ elif mode == 'listEpisodes':
     listEpisodes(seriesID, url)
 elif mode == 'configureUtility':
     configureUtility()
+elif mode == 'chromePluginOptions':
+    chromePluginOptions()
 elif mode == 'deleteCookies':
     deleteCookies()
 elif mode == 'deleteCache':
