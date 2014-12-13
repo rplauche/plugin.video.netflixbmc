@@ -387,8 +387,9 @@ def listGenres(type, videoType):
         type = 'KidsAltGenre'
     content = load(urlMain+"/WiHome")
     match = re.compile('/'+type+'\\?agid=(.+?)">(.+?)<', re.DOTALL).findall(content)
-    
-    for genreID, title in match:
+    # A number of categories (especially in the Kids genres) have duplicate entires and a lot of whitespice; create a stripped unique set
+    unique_match = set((k[0].strip(), k[1].strip()) for k in match)
+    for genreID, title in unique_match:
         if not genreID=="83":
             if isKidsProfile:
                 addDir(title, urlMain+"/"+type+"?agid="+genreID+"&pn=1&np=1&actionMethod=json", 'listVideos', "", videoType)
