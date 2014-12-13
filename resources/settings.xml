@@ -20,6 +20,8 @@
         <setting id="libraryPath" type="folder" label="30138" default="special://profile/addon_data/plugin.video.netflixbmc/library"/>
 
         <setting type="lsep" label="30210" /> <!-- Browser Settings -->
+        <setting id="useChromeProfile" type="bool" label="30212" default="true"/>
+        <setting label="30213" type="action" enable="eq(-1,true)" action="RunPlugin(plugin://plugin.video.netflixbmc/?mode=chromePluginOptions)"/>
         <setting id="remoteControl" type="bool" label="30137" default="false"/>
         <setting id="dontUseKiosk" type="bool" label="30133" default="false"/>
 
