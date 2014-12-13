@@ -774,7 +774,7 @@ def chooseProfile():
         selectedProfile = profiles[nr]
         load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+selectedProfile['token'])
         addon.setSetting("profile", selectedProfile['token'])
-        addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids else 'false')
+        addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids'] else 'false')
         saveState()
 
 
