@@ -17,7 +17,7 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import xbmcvfs
-import traceback
+from resources.lib import chrome_cookies
 
 try:
     import cPickle as pickle
@@ -567,7 +567,6 @@ def addMyListToLibrary():
             if updateDB:
                 xbmc.executebuiltin('UpdateLibrary(video)')
 
-
 def playVideo(id):
     playVideoMain(id)
     xbmc.sleep(5000)
@@ -654,6 +653,10 @@ def launchChrome(url):
                 z = zipfile.ZipFile(zf)
                 z.extractall(addonUserDataFolder)
         profileFolder = "&profileFolder="+urllib.quote_plus(userdir)
+
+        # Inject cookies
+        chrome_cookies.inject_cookies_into_chrome(session, os.path.join(userdir, "Default", "Cookies"))
+
 
     xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+profileFolder+")")
 
