@@ -763,11 +763,10 @@ def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
     if not len(match):
-        match = re.compile('"decodedName":"(.+?)".+?guid":"(.+?)"', re.DOTALL).findall(content)
+        match = re.compile('"decodedName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
     profiles = []
-    for p, t in match:
-        isKids = p.lower()=='kids'
-        profile = {'name': p, 'token': t, 'isKids': isKids}
+    for p, t, e in match:
+        profile = {'name': p, 'token': t, 'isKids': e=='jfk'}
         profiles.append(profile)
     dialog = xbmcgui.Dialog()
     nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
