@@ -54,6 +54,7 @@ sessionFile = xbmc.translatePath("special://profile/addon_data/"+addonID+"/sessi
 dontUseKiosk = addon.getSetting("dontUseKiosk") == "true"
 browseTvShows = addon.getSetting("browseTvShows") == "true"
 singleProfile = addon.getSetting("singleProfile") == "true"
+isKidsProfile = addon.getSetting('isKidsProfile') == 'true'
 showProfiles = addon.getSetting("showProfiles") == "true"
 forceView = addon.getSetting("forceView") == "true"
 useUtility = addon.getSetting("useUtility") == "true"
@@ -177,7 +178,6 @@ def main(type):
         addDir(translation(30007), "", 'listTvGenres', "", type)
     else:
         addDir(translation(30007), "WiGenre", 'listGenres', "", type)
-    addDir(translation(30009), "KidsAltGenre", 'listGenres', "", type)
     addDir(translation(30008), "", 'search', "", type)
     xbmcplugin.endOfDirectory(pluginhandle)
 
@@ -383,11 +383,15 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
 
 def listGenres(type, videoType):
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
+    if isKidsProfile:
+        type = 'KidsAltGenre'
     content = load(urlMain+"/WiHome")
     match = re.compile('/'+type+'\\?agid=(.+?)">(.+?)<', re.DOTALL).findall(content)
-    for genreID, title in match:
+    # A number of categories (especially in the Kids genres) have duplicate entires and a lot of whitespice; create a stripped unique set
+    unique_match = set((k[0].strip(), k[1].strip()) for k in match)
+    for genreID, title in unique_match:
         if not genreID=="83":
-            if type=="KidsAltGenre":
+            if isKidsProfile:
                 addDir(title, urlMain+"/"+type+"?agid="+genreID+"&pn=1&np=1&actionMethod=json", 'listVideos', "", videoType)
             else:
                 addDir(title, urlMain+"/"+type+"?agid="+genreID, 'listVideos', "", videoType)
@@ -759,18 +763,18 @@ def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
     if not len(match):
-        match = re.compile('"decodedName":"(.+?)".+?guid":"(.+?)"', re.DOTALL).findall(content)
+        match = re.compile('"decodedName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
     profiles = []
-    tokens = []
-    for p, t in match:
-        profiles.append(p)
-        tokens.append(t)
+    for p, t, e in match:
+        profile = {'name': p, 'token': t, 'isKids': e=='jfk'}
+        profiles.append(profile)
     dialog = xbmcgui.Dialog()
-    nr = dialog.select(translation(30113), profiles)
+    nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
     if nr >= 0:
-        token = tokens[nr]
-        load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+token)
-        addon.setSetting("profile", token)
+        selectedProfile = profiles[nr]
+        load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+selectedProfile['token'])
+        addon.setSetting("profile", selectedProfile['token'])
+        addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids'] else 'false')
         saveState()
 
 
