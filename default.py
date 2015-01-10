@@ -51,6 +51,7 @@ libraryFolderMovies = os.path.join(libraryFolder, "Movies")
 libraryFolderTV = os.path.join(libraryFolder, "TV")
 cookieFile = xbmc.translatePath("special://profile/addon_data/"+addonID+"/cookies")
 sessionFile = xbmc.translatePath("special://profile/addon_data/"+addonID+"/session")
+chromeUserDataFolder = os.path.join(addonUserDataFolder, "chrome-user-data")
 dontUseKiosk = addon.getSetting("dontUseKiosk") == "true"
 browseTvShows = addon.getSetting("browseTvShows") == "true"
 singleProfile = addon.getSetting("singleProfile") == "true"
@@ -649,17 +650,16 @@ def launchChrome(url):
 
     profileFolder = ""
     if useChromeProfile:
-        userdir = os.path.join(addonUserDataFolder, "chrome-user-data")
-        if not os.path.exists(userdir):
+        if not os.path.exists(chromeUserDataFolder):
             import zipfile
             zip = os.path.join(addonDir, "resources", "chrome-user-data.zip")
             with open(zip, "r") as zf:
                 z = zipfile.ZipFile(zf)
                 z.extractall(addonUserDataFolder)
-        profileFolder = "&profileFolder="+urllib.quote_plus(userdir)
+        profileFolder = "&profileFolder="+urllib.quote_plus(chromeUserDataFolder)
 
         # Inject cookies
-        chrome_cookies.inject_cookies_into_chrome(session, os.path.join(userdir, "Default", "Cookies"))
+        chrome_cookies.inject_cookies_into_chrome(session, os.path.join(chromeUserDataFolder, "Default", "Cookies"))
 
 
     xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+profileFolder+")")
@@ -689,6 +689,13 @@ def deleteCache():
         except:
             pass
 
+def deleteChromeUserDataFolder():
+    if os.path.exists(chromeUserDataFolder):
+        try:
+            shutil.rmtree(chromeUserDataFolder)
+            xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,Chrome UserData has been deleted!,5000,'+icon+')')
+        except:
+            pass
 
 def resetAddon():
     dialog = xbmcgui.Dialog()
@@ -1104,6 +1111,8 @@ elif mode == 'deleteCookies':
     deleteCookies()
 elif mode == 'deleteCache':
     deleteCache()
+elif mode == 'deleteChromeUserData':
+    deleteChromeUserDataFolder()
 elif mode == 'resetAddon':
     resetAddon()
 elif mode == 'playTrailer':
