@@ -653,7 +653,7 @@ def launchChrome(url):
         if not os.path.exists(chromeUserDataFolder):
             import zipfile
             zip = os.path.join(addonDir, "resources", "chrome-user-data.zip")
-            with open(zip, "r") as zf:
+            with open(zip, "rb") as zf:
                 z = zipfile.ZipFile(zf)
                 z.extractall(addonUserDataFolder)
         profileFolder = "&profileFolder="+urllib.quote_plus(chromeUserDataFolder)
