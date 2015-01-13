@@ -11,6 +11,7 @@ cp -a \
 $DATA_DIR/Default/Cookies \
 $DATA_DIR/Default/Extensions \
 $DATA_DIR/Default/Preferences \
+$DATA_DIR/Default/Secure\ Preferences \
 $TEMP_DIR/Default/
 
 rm -rf chrome-user-data.zip
