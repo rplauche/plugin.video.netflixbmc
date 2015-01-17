@@ -302,6 +302,8 @@ def listSearchVideos(url, type):
     else:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30146))+',5000,'+icon+')')
 
+def clean_filename(n, chars=None):
+    return (''.join(c for c in unicode(n, "utf-8") if c not in '/\\:?"*|<>')).strip(chars)
 
 def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     videoDetails = getVideoInfo(videoID)
@@ -344,8 +346,8 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
             titleTemp = titleTemp[:titleTemp.find(": ")]
         if "-" in yearTemp:
             yearTemp = yearTemp.split("-")[0]
-        filename = (''.join(c for c in videoID.encode("utf-8") if c not in '/\\:?"*|<>')).strip()+".jpg"
-        filenameNone = (''.join(c for c in videoID.encode("utf-8") if c not in '/\\:?"*|<>')).strip()+".none"
+        filename = clean_filename(videoID)+".jpg"
+        filenameNone = clean_filename(videoID)+".none"
         coverFile = os.path.join(cacheFolderCoversTMDB, filename)
         coverFileNone = os.path.join(cacheFolderCoversTMDB, filenameNone)
         if not os.path.exists(coverFile) and not os.path.exists(coverFileNone):
@@ -792,7 +794,7 @@ def forceChooseProfile():
 
 
 def addMovieToLibrary(movieID, title, singleUpdate=True):
-    movieFolderName = (''.join(c for c in unicode(title, 'utf-8') if c not in '/\\:?"*|<>')).strip(' .')
+    movieFolderName = clean_filename(title, ' .').strip(' .')
     dir = os.path.join(libraryFolderMovies, movieFolderName)
     if not os.path.isdir(dir):
         xbmcvfs.mkdir(dir)
@@ -804,7 +806,7 @@ def addMovieToLibrary(movieID, title, singleUpdate=True):
 
 
 def addSeriesToLibrary(seriesID, seriesTitle, season, singleUpdate=True):
-    seriesFolderName = (''.join(c for c in unicode(seriesTitle, 'utf-8') if c not in '/\\:?"*|<>')).strip(' .')
+    seriesFolderName = clean_filename(seriesTitle, ' .')
     seriesDir = os.path.join(libraryFolderTV, seriesFolderName)
     if not os.path.isdir(seriesDir):
         xbmcvfs.mkdir(seriesDir)
@@ -829,7 +831,7 @@ def addSeriesToLibrary(seriesID, seriesTitle, season, singleUpdate=True):
                 if len(seasonNr) == 1:
                     seasonNr = "0"+seasonNr
                 filename = "S"+seasonNr+"E"+episodeNr+" - "+episodeTitle+".strm"
-                filename = (''.join(c for c in filename.decode("utf-8") if c not in '/\\:?"*|<>')).strip(' .')
+                filename = clean_filename(filename, ' .')
                 fh = xbmcvfs.File(os.path.join(seasonDir, filename), 'w')
                 fh.write("plugin://plugin.video.netflixbmc/?mode=playVideo&url="+episodeID)
                 fh.close()
@@ -880,7 +882,7 @@ def addDir(name, url, mode, iconimage, type=""):
 
 
 def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
-    filename = (''.join(c for c in url.encode("utf-8") if c not in '/\\:?"*|<>')).strip()+".jpg"
+    filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
     if os.path.exists(coverFile):
@@ -914,7 +916,7 @@ def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", 
 
 
 def addVideoDirR(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
-    filename = (''.join(c for c in url.encode("utf-8") if c not in '/\\:?"*|<>')).strip()+".jpg"
+    filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
     if os.path.exists(coverFile):
@@ -947,7 +949,7 @@ def addVideoDirR(name, url, mode, iconimage, videoType="", desc="", duration="",
 
 
 def addSeasonDir(name, url, mode, iconimage, seriesName, seriesID):
-    filename = (''.join(c for c in seriesID.encode("utf-8") if c not in '/\\:?"*|<>')).strip()+".jpg"
+    filename = clean_filename(seriesID)+".jpg"
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&seriesID="+urllib.quote_plus(seriesID)
@@ -966,7 +968,7 @@ def addSeasonDir(name, url, mode, iconimage, seriesName, seriesID):
 
 
 def addEpisodeDir(name, url, mode, iconimage, desc="", duration="", season="", episodeNr="", seriesID="", playcount=""):
-    filename = (''.join(c for c in seriesID.encode("utf-8") if c not in '/\\:?"*|<>')).strip()+".jpg"
+    filename = clean_filename(seriesID)+".jpg"
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)
