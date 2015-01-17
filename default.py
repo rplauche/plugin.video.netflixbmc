@@ -469,7 +469,7 @@ def listViewingActivity(type):
         matchTitle1 = re.compile('class="seriestitle">(.+?)</a>', re.DOTALL).findall(entry)
         matchTitle2 = re.compile('class="col title">.+?>(.+?)<', re.DOTALL).findall(entry)
         if matchTitle1:
-            title = htmlParser.unescape(matchTitle1[0]).replace("</span>", "")
+            title = htmlParser.unescape(matchTitle1[0].decode("utf-8")).replace("</span>", "").encode("utf-8")
         elif matchTitle2:
             title = matchTitle2[0]
         else:
