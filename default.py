@@ -829,7 +829,7 @@ def addSeriesToLibrary(seriesID, seriesTitle, season, singleUpdate=True):
                 if len(seasonNr) == 1:
                     seasonNr = "0"+seasonNr
                 filename = "S"+seasonNr+"E"+episodeNr+" - "+episodeTitle+".strm"
-                filename = (''.join(c for c in filename.encode("utf-8") if c not in '/\\:?"*|<>')).strip(' .')
+                filename = (''.join(c for c in filename.decode("utf-8") if c not in '/\\:?"*|<>')).strip(' .')
                 fh = xbmcvfs.File(os.path.join(seasonDir, filename), 'w')
                 fh.write("plugin://plugin.video.netflixbmc/?mode=playVideo&url="+episodeID)
                 fh.close()
