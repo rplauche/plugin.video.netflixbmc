@@ -68,9 +68,4 @@
   <string id="30213">Open Plugin Instellingen</string>
   <!--Appologies for any translation problems, below was done with google-->
   <string id="30214">SSL Type Aansluiting</string>
-  <string id="30215">Automatisch</string>
-  <string id="30216">SSLv2</string>
-  <string id="30217">SSLv23</string>
-  <string id="30218">SSLv3</string>
-  <string id="30219">TLSv1</string>
 </strings>

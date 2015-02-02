@@ -67,9 +67,4 @@
   <string id="30212">Use Chrome Control Plugin</string>
   <string id="30213">Open Plugin Settings</string>
   <string id="30214">SSL Connection Type</string>
-  <string id="30215">Auto</string>
-  <string id="30216">SSLv2</string>
-  <string id="30217">SSLv23</string>
-  <string id="30218">SSLv3</string>
-  <string id="30219">TLSv1</string>
 </strings>

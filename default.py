@@ -90,35 +90,21 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 import ssl
 
-
-try:
-    sslSettings = [None,
-              ssl.PROTOCOL_SSLv2,
-              ssl.PROTOCOL_SSLv23,
-              ssl.PROTOCOL_SSLv3,
-              ssl.PROTOCOL_TLSv1]
-    sslSetting = sslSettings[int(addon.getSetting("sslSetting"))]
-except (ValueError, IndexError):
-     sslSetting = None
-
 class SSLAdapter(HTTPAdapter):
     '''An HTTPS Transport Adapter that uses an arbitrary SSL version.'''
-    def __init__(self, ssl_version=None, **kwargs):
-        self.ssl_version = ssl_version
-        super(SSLAdapter, self).__init__(**kwargs)
-
     def init_poolmanager(self, connections, maxsize, block=False):
+        ssl_version = addon.getSetting("sslSetting")
+        ssl_version = None if ssl_version == 'Auto' else ssl_version
         self.poolmanager = PoolManager(num_pools=connections,
                                        maxsize=maxsize,
                                        block=block,
-                                       ssl_version=self.ssl_version)
+                                       ssl_version=ssl_version)
 
 urlMain = "https://www.netflix.com"
 session = None
 def newSession():
     s = requests.Session()
-    if sslSetting is not None:
-        s.mount('https://', SSLAdapter(sslSetting))
+    s.mount('https://', SSLAdapter())
     s.headers.update({
         'User-Agent': 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.6 Safari/537.36',
     })
