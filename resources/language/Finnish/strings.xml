@@ -10,7 +10,7 @@
   <string id="30009">KIDS</string>
   <string id="30010">Katseluhistoria</string>
   <string id="30011">Elokuvat</string>
-  <string id="30012">TV-Sarjat</string>
+  <string id="30012">TV-Ohjelmat</string>
   <string id="30101">S-posti</string>
   <string id="30102">Salasana</string>
   <string id="30103">Yhden käyttäjän tunnus (nopeampi)</string>
@@ -29,7 +29,7 @@
   <string id="30117">Näytä profiilin valinta aina</string>
   <string id="30118">Näytä kaudet</string>
   <string id="30119">ViewID (Jaksot)</string>
-  <string id="30120">Selaa TV-sarjoja, älä toista niitä automaattisesti</string>
+  <string id="30120">Selaa TV-Ohjelmia, älä toista niitä automaattisesti</string>
   <string id="30121">Jatka katselua</string>
   <string id="30122">Lisää kirjastoon</string>
   <string id="30123">Päivitä kirjasto sisällön lisäämisen jälkeen</string>
@@ -47,7 +47,7 @@
   <string id="30138">Kirjaston osoite (lähde)</string>
   <string id="30139">Nollaa NetfliXBMC!</string>
   <string id="30140">Samanlaisia elokuvia</string>
-  <string id="30141">Samanlaisia TV-sarjoja</string>
+  <string id="30141">Samanlaisia TV-Ohjelmia</string>
   <string id="30142">Ladataan metatietoja</string>
   <string id="30143">Ehdotukset</string>
   <string id="30144">Lisätty omalle listalle!</string>
