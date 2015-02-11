@@ -369,7 +369,7 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     match = re.compile('src=".+?">.*?<.*?>(.+?)<', re.DOTALL).findall(videoDetails)
     desc = ""
     if match:
-        desc = htmlParser.unescape(match[0])
+        desc = htmlParser.unescape(match[0].decode("utf-8"))
     match = re.compile('Director:</dt><dd>(.+?)<', re.DOTALL).findall(videoDetails)
     director = ""
     if match:
@@ -382,7 +382,7 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     rating = ""
     if rating:
         rating = match[0]
-    title = htmlParser.unescape(title)
+    title = htmlParser.unescape(title.decode("utf-8"))
     nextMode = "playVideoMain"
     if browseTvShows and videoType == "tvshow":
         nextMode = "listSeasons"
@@ -564,7 +564,7 @@ def addMyListToLibrary():
                 videoDetails = getVideoInfo(videoID)
                 match = re.compile('<span class="title ".*?>(.+?)<\/span>', re.DOTALL).findall(videoDetails)
                 title = match[0].strip()
-                title = htmlParser.unescape(title)
+                title = htmlParser.unescape(title.decode("utf-8"))
                 match = re.compile('<span class="year".*?>(.+?)<\/span>', re.DOTALL).findall(videoDetails)
                 year = ""
                 if match:
@@ -896,6 +896,7 @@ def addDir(name, url, mode, iconimage, type=""):
 
 
 def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
+    name = name.encode("utf-8")
     filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
