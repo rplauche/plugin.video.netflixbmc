@@ -1032,26 +1032,32 @@ class window(xbmcgui.WindowXMLDialog):
             else:
                 self.close()
         elif osLinux:
-            proc = subprocess.Popen('/bin/ps ax', shell=True, stdout=subprocess.PIPE)
-            procAll = ""
-            for line in proc.stdout:
-                procAll+=line
-            if "chrome" in procAll or "chromium" in procAll:
-                if action in [ACTION_SHOW_INFO, ACTION_SHOW_GUI, ACTION_STOP, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, KEY_BUTTON_BACK]:
-                    subprocess.Popen('xdotool key alt+F4', shell=True)
+            doClose = False
+            key=None
+            if action in [ACTION_SHOW_INFO, ACTION_SHOW_GUI, ACTION_STOP, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, KEY_BUTTON_BACK]:
+                key="alt+F4"
+                doClose=True
+            elif action==ACTION_SELECT_ITEM:
+                key="space"
+            elif action==ACTION_MOVE_LEFT:
+                key="Left"
+            elif action==ACTION_MOVE_RIGHT:
+                key="Right"
+            elif action==ACTION_MOVE_UP:
+                key="Up"
+            elif action==ACTION_MOVE_DOWN:
+                key="Down"
+            elif debug:
+                print "Netflixbmc: unmapped key action=%d" % (action.getId())
+            if key is not None:
+                p = subprocess.Popen('xdotool search --onlyvisible --class "google-chrome|Chromium" key %s' % key, shell=True)
+                p.wait()
+                # 0 for success, 127 if xdotool not found in PATH. Return code is 1 if window not found (indicating should close).
+                if not p.returncode in [0,127] or doClose:
                     self.close()
-                elif action==ACTION_SELECT_ITEM:
-                    subprocess.Popen('xdotool key space', shell=True)
-                elif action==ACTION_MOVE_LEFT:
-                    subprocess.Popen('xdotool key Left', shell=True)
-                elif action==ACTION_MOVE_RIGHT:
-                    subprocess.Popen('xdotool key Right', shell=True)
-                elif action==ACTION_MOVE_UP:
-                    subprocess.Popen('xdotool key Up', shell=True)
-                elif action==ACTION_MOVE_DOWN:
-                    subprocess.Popen('xdotool key Down', shell=True)
-            else:
-                self.close()
+                if debug:
+                    print "Netflixbmc: remote action=%d key=%s xdotool result=%d" % (action.getId(), key, p.returncode)
+
         elif osOSX:
             proc = subprocess.Popen('/bin/ps ax', shell=True, stdout=subprocess.PIPE)
             procAll = ""
