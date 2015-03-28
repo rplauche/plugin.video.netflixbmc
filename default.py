@@ -1002,6 +1002,7 @@ class window(xbmcgui.WindowXMLDialog):
         ACTION_SELECT_ITEM = 7
         ACTION_PARENT_DIR = 9
         ACTION_PREVIOUS_MENU = 10
+        ACTION_PAUSE = 12
         ACTION_STOP = 13
         ACTION_SHOW_INFO = 11
         ACTION_SHOW_GUI = 18
@@ -1009,6 +1010,11 @@ class window(xbmcgui.WindowXMLDialog):
         ACTION_MOVE_RIGHT = 2
         ACTION_MOVE_UP = 3
         ACTION_MOVE_DOWN = 4
+        ACTION_PLAYER_PLAY = 79
+        ACTION_VOLUME_UP = 88
+        ACTION_VOLUME_DOWN = 89
+        ACTION_MUTE = 91
+        ACTION_CONTEXT_MENU = 117
         KEY_BUTTON_BACK = 275
         if osWin:
             proc = subprocess.Popen('WMIC PROCESS get Caption', shell=True, stdout=subprocess.PIPE)
@@ -1034,10 +1040,10 @@ class window(xbmcgui.WindowXMLDialog):
         elif osLinux:
             doClose = False
             key=None
-            if action in [ACTION_SHOW_INFO, ACTION_SHOW_GUI, ACTION_STOP, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, KEY_BUTTON_BACK]:
+            if action in [ACTION_SHOW_GUI, ACTION_STOP, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, KEY_BUTTON_BACK]:
                 key="alt+F4"
                 doClose=True
-            elif action==ACTION_SELECT_ITEM:
+            elif action in [ ACTION_SELECT_ITEM, ACTION_PLAYER_PLAY, ACTION_PAUSE ]:
                 key="space"
             elif action==ACTION_MOVE_LEFT:
                 key="Left"
@@ -1047,6 +1053,16 @@ class window(xbmcgui.WindowXMLDialog):
                 key="Up"
             elif action==ACTION_MOVE_DOWN:
                 key="Down"
+            elif action==ACTION_SHOW_INFO:
+                key="question"
+            elif action==ACTION_VOLUME_UP:
+                key="bracketright"
+            elif action==ACTION_VOLUME_DOWN:
+                key="bracketleft"
+            elif action==ACTION_MUTE:
+                key="M"
+            elif action==ACTION_CONTEXT_MENU:
+                key="ctrl+alt+shift+d"
             elif debug:
                 print "Netflixbmc: unmapped key action=%d" % (action.getId())
             if key is not None:
@@ -1057,7 +1073,6 @@ class window(xbmcgui.WindowXMLDialog):
                     self.close()
                 if debug:
                     print "Netflixbmc: remote action=%d key=%s xdotool result=%d" % (action.getId(), key, p.returncode)
-
         elif osOSX:
             proc = subprocess.Popen('/bin/ps ax', shell=True, stdout=subprocess.PIPE)
             procAll = ""
