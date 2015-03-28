@@ -1041,7 +1041,7 @@ class window(xbmcgui.WindowXMLDialog):
                     subprocess.Popen('xdotool key alt+F4', shell=True)
                     self.close()
                 elif action==ACTION_SELECT_ITEM:
-                    subprocess.Popen('xdotool key Space', shell=True)
+                    subprocess.Popen('xdotool key space', shell=True)
                 elif action==ACTION_MOVE_LEFT:
                     subprocess.Popen('xdotool key Left', shell=True)
                 elif action==ACTION_MOVE_RIGHT:
