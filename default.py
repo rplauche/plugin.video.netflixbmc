@@ -788,7 +788,7 @@ def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
     if not len(match):
-        match = re.compile('"decodedName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
+        match = re.compile('"firstName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
     profiles = []
     for p, t, e in match:
         profile = {'name': p, 'token': t, 'isKids': e=='jfk'}
