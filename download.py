@@ -9,17 +9,22 @@ import urllib
 import urllib2
 import shutil
 
-
 def download(videoID, title, year):
     filename = (''.join(c for c in unicode(videoID, 'utf-8') if c not in '/\\:?"*|<>')).strip()+".jpg"
     filenameNone = (''.join(c for c in unicode(videoID, 'utf-8') if c not in '/\\:?"*|<>')).strip()+".none"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     coverFileNone = os.path.join(cacheFolderCoversTMDB, filenameNone)
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
-    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+data+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()
+    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()
     match = re.compile('"poster_path":"(.+?)"', re.DOTALL).findall(content)
+
+    # maybe its a mini-series (TMDb calls them movies)
+    if not match and videoType == "tv":
+        content = opener.open("http://api.themoviedb.org/3/search/movie?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()
+        match = re.compile('"poster_path":"(.+?)"', re.DOTALL).findall(content)
+
     if match:
-        coverUrl = "http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original"+match[0]
+        coverUrl = "http://image.tmdb.org/t/p/original"+match[0]
         contentJPG = opener.open(coverUrl).read()
         fh = open(coverFile, 'wb')
         fh.write(contentJPG)
@@ -30,7 +35,7 @@ def download(videoID, title, year):
         fh.close()
     match = re.compile('"backdrop_path":"(.+?)"', re.DOTALL).findall(content)
     if match:
-        fanartUrl = "http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original"+match[0]
+        fanartUrl = "http://image.tmdb.org/t/p/original"+match[0]
         contentJPG = opener.open(fanartUrl).read()
         fh = open(fanartFile, 'wb')
         fh.write(contentJPG)
@@ -38,7 +43,7 @@ def download(videoID, title, year):
 
 addonID = 'plugin.video.netflixbmc'
 addon = xbmcaddon.Addon(id=addonID)
-data = base64.b64decode("NDc2N2I0YjJiYjk0YjEwNGZhNTUxNWM1ZmY0ZTFmZWM=")
+apiKey = base64.b64decode("NDc2N2I0YjJiYjk0YjEwNGZhNTUxNWM1ZmY0ZTFmZWM=")
 addonUserDataFolder = xbmc.translatePath("special://profile/addon_data/"+addonID)
 cacheFolder = os.path.join(addonUserDataFolder, "cache")
 cacheFolderCoversTMDB = os.path.join(cacheFolder, "covers")
@@ -55,4 +60,4 @@ year = urllib.unquote_plus(sys.argv[4])
 try:
     download(videoID, title, year)
 except:
-    pass
+    pass 
