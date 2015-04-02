@@ -73,7 +73,8 @@ auth = addon.getSetting("auth")
 linuxUseShellScript = addon.getSetting("linuxUseShellScript") == "true"
 debug = addon.getSetting("debug") == "true"
 
-if len(language.split("-"))>1:
+country = addon.getSetting("country")
+if len(country)==0 and len(language.split("-"))>1:
     country = language.split("-")[1]
 
 trace_on = False
@@ -111,9 +112,11 @@ def newSession():
     return s
 session = newSession()
 
+def unescape(s):
+    return htmlParser.unescape(s)
+
 def load(url, post = None):
-    if debug:
-        print "URL: " + url
+    debug("URL: " + url)
 
     r = ""
     try:
@@ -365,6 +368,7 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
         coverFile = os.path.join(cacheFolderCoversTMDB, filename)
         coverFileNone = os.path.join(cacheFolderCoversTMDB, filenameNone)
         if not os.path.exists(coverFile) and not os.path.exists(coverFileNone):
+            debug("Downloading Cover art. videoType:"+videoTypeTemp+", videoID:" + videoID + ", title:"+titleTemp+", year:"+yearTemp)
             xbmc.executebuiltin('XBMC.RunScript('+downloadScript+', '+urllib.quote_plus(videoTypeTemp)+', '+urllib.quote_plus(videoID)+', '+urllib.quote_plus(titleTemp)+', '+urllib.quote_plus(yearTemp)+')')
     match = re.compile('src=".+?">.*?<.*?>(.+?)<', re.DOTALL).findall(videoDetails)
     desc = ""
@@ -625,8 +629,7 @@ def playVideoMain(id):
             xbmc.executebuiltin('LIRC.Stop')
             
             call = '"'+browserScript+'" "'+url+'"';
-            if debug:
-                print "Browser Call: " + call
+            debug("Browser Call: " + call)
             subprocess.call(call, shell=True)
             
             xbmc.executebuiltin('LIRC.Start')
@@ -768,10 +771,19 @@ def login():
                 # Login Failed
                 xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30127))+',15000,'+icon+')')
                 return False
+            
             match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
             if match and not addon.getSetting("language"):
                 addon.setSetting("language", match[0])
+            
+            match = re.compile('"COUNTRY":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
+            if match:
+                # always overwrite the country code, to cater for switching regions
+                debug("Setting Country: " + match[0])
+                addon.setSetting("country", match[0])
+                
             saveState()
+            
         if not addon.getSetting("profile") and not singleProfile:
             chooseProfile()
         elif not singleProfile and showProfiles:
@@ -781,15 +793,18 @@ def login():
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30126))+',10000,'+icon+')')
         return False
 
-
+def debug(message):
+    if debug:
+        print message
+        
 def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
     if not len(match):
-        match = re.compile('"decodedName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
+        match = re.compile('"firstName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
     profiles = []
     for p, t, e in match:
-        profile = {'name': p, 'token': t, 'isKids': e=='jfk'}
+        profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
         profiles.append(profile)
     dialog = xbmcgui.Dialog()
     nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
