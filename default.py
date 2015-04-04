@@ -207,6 +207,7 @@ def wiHome(type):
     match2 = re.compile('class="hd clearfix"><h3><a href="(.+?)">(.+?)<', re.DOTALL).findall(content)
     for temp, title, sliderID in match1:
         if not "hide-completely" in temp:
+            title = re.sub('<.(.+?)</.>', '', title)
             addDir(title.strip(), sliderID, 'listSliderVideos', "", type)
     for url, title in match2:
         if "WiAltGenre" in url or "WiSimilarsByViewType" in url or "WiRecentAdditionsGallery" in url:
