@@ -805,6 +805,8 @@ def chooseProfile():
     if not len(match):
         match = re.compile('"firstName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
     profiles = []
+    # remove any duplicated profile data found during page scrape
+    match = [item for count, item in enumerate(match) if item not in match[:count]]
     for p, t, e in match:
         profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
         profiles.append(profile)
