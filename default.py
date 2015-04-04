@@ -749,6 +749,7 @@ def removeFromQueue(id):
 
 
 def login():
+    session.cookies.clear()
     content = load(urlMain+"/Login")
     match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
     if match and not addon.getSetting("language"):
