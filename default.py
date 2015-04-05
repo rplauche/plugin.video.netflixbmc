@@ -207,6 +207,7 @@ def wiHome(type):
     match2 = re.compile('class="hd clearfix"><h3><a href="(.+?)">(.+?)<', re.DOTALL).findall(content)
     for temp, title, sliderID in match1:
         if not "hide-completely" in temp:
+            title = re.sub('<.(.+?)</.>', '', title)
             addDir(title.strip(), sliderID, 'listSliderVideos', "", type)
     for url, title in match2:
         if "WiAltGenre" in url or "WiSimilarsByViewType" in url or "WiRecentAdditionsGallery" in url:
@@ -749,6 +750,7 @@ def removeFromQueue(id):
 
 
 def login():
+    session.cookies.clear()
     content = load(urlMain+"/Login")
     match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
     if match and not addon.getSetting("language"):
@@ -805,6 +807,8 @@ def chooseProfile():
     if not len(match):
         match = re.compile('"firstName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
     profiles = []
+    # remove any duplicated profile data found during page scrape
+    match = [item for count, item in enumerate(match) if item not in match[:count]]
     for p, t, e in match:
         profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
         profiles.append(profile)
