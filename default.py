@@ -71,6 +71,7 @@ viewIdActivity = addon.getSetting("viewIdActivity")
 winBrowser = int(addon.getSetting("winBrowserNew"))
 language = addon.getSetting("language")
 auth = addon.getSetting("auth")
+authMyList = addon.getSetting("authMyList")
 linuxUseShellScript = addon.getSetting("linuxUseShellScript") == "true"
 debug = addon.getSetting("debug") == "true"
 
@@ -729,7 +730,6 @@ def resetAddon():
           except:
               pass
 
-
 def search(type):
     keyboard = xbmc.Keyboard('', translation(30008))
     keyboard.doModal()
@@ -737,17 +737,22 @@ def search(type):
         search_string = keyboard.getText().replace(" ", "+")
         listSearchVideos("http://api-global.netflix.com/desktop/search/instantsearch?esn=www&term="+search_string+"&locale="+language+"&country="+country+"&authURL="+auth+"&_retry=0&routing=redirect", type)
 
-
 def addToQueue(id):
-    load(urlMain+"/AddToQueue?movieid="+id+"&authURL="+auth)
-    xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30144))+',3000,'+icon+')')
-
+    if authMyList:
+        encodedAuth = urllib.urlencode({'authURL': authMyList})
+        load(urlMain+"/AddToQueue?movieid="+id+"&qtype=INSTANT&"+encodedAuth)
+        xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30144))+',3000,'+icon+')')
+    else:
+        debug("Attempted to addToQueue without valid authMyList")
 
 def removeFromQueue(id):
-    load(urlMain+"/QueueDelete?movieid="+id+"&authURL="+auth)
-    xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30145))+',3000,'+icon+')')
-    xbmc.executebuiltin("Container.Refresh")
-
+    if authMyList:
+        encodedAuth = urllib.urlencode({'authURL': authMyList})
+        load(urlMain+"/QueueDelete?"+encodedAuth+"&qtype=ED&movieid="+id)
+        xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30145))+',3000,'+icon+')')
+        xbmc.executebuiltin("Container.Refresh")
+    else:
+         debug("Attempted to removeFromQueue without valid authMyList")
 
 def login():
     session.cookies.clear()
@@ -792,6 +797,8 @@ def login():
             chooseProfile()
         elif not singleProfile and showProfiles:
             chooseProfile()
+        elif singleProfile:
+            getMyListChangeAuthorisation()
         return True
     else:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30126))+',10000,'+icon+')')
@@ -820,7 +827,14 @@ def chooseProfile():
         addon.setSetting("profile", selectedProfile['token'])
         addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids'] else 'false')
         saveState()
+    getMyListChangeAuthorisation()
 
+def getMyListChangeAuthorisation():
+    content = load(urlMain+"/WiHome")
+    match = re.compile('"xsrf":"(.+?)"', re.DOTALL).findall(content)
+    if match:
+        authMyList = match[0]
+        addon.setSetting("authMyList", match[0])
 
 def forceChooseProfile():
     addon.setSetting("singleProfile", "false")
