@@ -596,10 +596,9 @@ def addMyListToLibrary():
                 xbmc.executebuiltin('UpdateLibrary(video)')
 
 def playVideo(id):
-    playVideoMain(id)
-    xbmc.sleep(5000)
     listitem = xbmcgui.ListItem(path=fakeVidPath)
     xbmcplugin.setResolvedUrl(pluginhandle, True, listitem)
+    playVideoMain(id)
     xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
 
 
@@ -843,13 +842,9 @@ def forceChooseProfile():
 
 
 def addMovieToLibrary(movieID, title, singleUpdate=True):
-    movieFolderName = clean_filename(title, ' .').strip(' .')
-    dir = os.path.join(libraryFolderMovies, movieFolderName)
-    if not os.path.isdir(dir):
-        xbmcvfs.mkdir(dir)
-        fh = xbmcvfs.File(os.path.join(dir, "movie.strm"), 'w')
-        fh.write("plugin://plugin.video.netflixbmc/?mode=playVideo&url="+movieID)
-        fh.close()
+    fh = xbmcvfs.File(os.path.join(libraryFolderMovies, title+".strm"), 'w')
+    fh.write("plugin://plugin.video.netflixbmc/?mode=playVideo&url="+movieID)
+    fh.close()
     if updateDB and singleUpdate:
         xbmc.executebuiltin('UpdateLibrary(video)')
 
