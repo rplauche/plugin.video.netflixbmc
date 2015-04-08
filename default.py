@@ -1152,11 +1152,10 @@ class window(xbmcgui.WindowXMLDialog):
                 procAll+=line
             if "chrome" in procAll:
                 if action in [ACTION_SHOW_INFO, ACTION_SHOW_GUI, ACTION_STOP, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, KEY_BUTTON_BACK]:
-                    subprocess.Popen('cliclick kd:alt', shell=True)
-                    subprocess.Popen('cliclick kp:f4', shell=True)
+                    subprocess.Popen('cliclick kd:cmd t:q ku:cmd', shell=True)
                     self.close()
                 elif action==ACTION_SELECT_ITEM:
-                    subprocess.Popen('cliclick kp:return', shell=True)
+                    subprocess.Popen('cliclick t:p', shell=True)
                 elif action==ACTION_MOVE_LEFT:
                     subprocess.Popen('cliclick kp:arrow-left', shell=True)
                 elif action==ACTION_MOVE_RIGHT:
