@@ -842,7 +842,9 @@ def forceChooseProfile():
 
 
 def addMovieToLibrary(movieID, title, singleUpdate=True):
-    fh = xbmcvfs.File(os.path.join(libraryFolderMovies, title+".strm"), 'w')
+    movieFolderName = clean_filename(title+".strm", ' .').strip(' .')
+    dirAndFilename = os.path.join(libraryFolderMovies, movieFolderName)
+    fh = xbmcvfs.File(dirAndFilename, 'w')
     fh.write("plugin://plugin.video.netflixbmc/?mode=playVideo&url="+movieID)
     fh.close()
     if updateDB and singleUpdate:
