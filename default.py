@@ -323,7 +323,10 @@ def listSearchVideos(url, type):
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30146))+',5000,'+icon+')')
 
 def clean_filename(n, chars=None):
-    return (''.join(c for c in unicode(n, "utf-8") if c not in '/\\:?"*|<>')).strip(chars)
+    if isinstance(n, str):
+        return (''.join(c for c in unicode(n, "utf-8") if c not in '/\\:?"*|<>')).strip(chars)
+    elif isinstance(n, unicode):
+        return (''.join(c for c in n if c not in '/\\:?"*|<>')).strip(chars)
 
 def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     videoDetails = getVideoInfo(videoID)
@@ -544,6 +547,13 @@ def getSeriesInfo(seriesID):
 
 
 def addMyListToLibrary():
+
+    if not singleProfile:
+        token = ""
+        if addon.getSetting("profile"):
+            token = addon.getSetting("profile")
+            load("https://www.netflix.com/SwitchProfile?tkn="+token)
+
     content = load(urlMain+"/MyList?leid=595&link=seeall")
     if not 'id="page-LOGIN"' in content:
         if singleProfile and 'id="page-ProfilesGate"' in content:
@@ -567,6 +577,7 @@ def addMyListToLibrary():
                 match = match4
             elif match5:
                 match = match5
+                
             for videoID in match:
                 videoDetails = getVideoInfo(videoID)
                 match = re.compile('<span class="title ".*?>(.+?)<\/span>', re.DOTALL).findall(videoDetails)
