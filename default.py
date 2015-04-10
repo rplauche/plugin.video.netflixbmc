@@ -323,7 +323,10 @@ def listSearchVideos(url, type):
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30146))+',5000,'+icon+')')
 
 def clean_filename(n, chars=None):
-    return (''.join(c for c in unicode(n, "utf-8") if c not in '/\\:?"*|<>')).strip(chars)
+    if isinstance(n, str):
+        return (''.join(c for c in unicode(n, "utf-8") if c not in '/\\:?"*|<>')).strip(chars)
+    elif isinstance(n, unicode):
+        return (''.join(c for c in n if c not in '/\\:?"*|<>')).strip(chars)
 
 def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     videoDetails = getVideoInfo(videoID)
@@ -544,6 +547,13 @@ def getSeriesInfo(seriesID):
 
 
 def addMyListToLibrary():
+
+    if not singleProfile:
+        token = ""
+        if addon.getSetting("profile"):
+            token = addon.getSetting("profile")
+            load("https://www.netflix.com/SwitchProfile?tkn="+token)
+
     content = load(urlMain+"/MyList?leid=595&link=seeall")
     if not 'id="page-LOGIN"' in content:
         if singleProfile and 'id="page-ProfilesGate"' in content:
@@ -567,6 +577,7 @@ def addMyListToLibrary():
                 match = match4
             elif match5:
                 match = match5
+                
             for videoID in match:
                 videoDetails = getVideoInfo(videoID)
                 match = re.compile('<span class="title ".*?>(.+?)<\/span>', re.DOTALL).findall(videoDetails)
@@ -791,12 +802,13 @@ def login():
                 addon.setSetting("country", match[0])
                 
             saveState()
-            
         if not addon.getSetting("profile") and not singleProfile:
             chooseProfile()
         elif not singleProfile and showProfiles:
             chooseProfile()
-        elif singleProfile:
+        elif not singleProfile and not showProfiles:
+            loadProfile()
+        else:
             getMyListChangeAuthorisation()
         return True
     else:
@@ -806,7 +818,16 @@ def login():
 def debug(message):
     if debug:
         print message
-        
+
+def loadProfile():
+    savedProfile = addon.getSetting("profile")
+    if savedProfile:
+        load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+savedProfile)
+        saveState()
+    else:
+        debug("LoadProfile: No stored profile found")
+    getMyListChangeAuthorisation()
+
 def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
