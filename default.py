@@ -802,12 +802,13 @@ def login():
                 addon.setSetting("country", match[0])
                 
             saveState()
-            
         if not addon.getSetting("profile") and not singleProfile:
             chooseProfile()
         elif not singleProfile and showProfiles:
             chooseProfile()
-        elif singleProfile:
+        elif not singleProfile and not showProfiles:
+            loadProfile()
+        else:
             getMyListChangeAuthorisation()
         return True
     else:
@@ -817,7 +818,16 @@ def login():
 def debug(message):
     if debug:
         print message
-        
+
+def loadProfile():
+    savedProfile = addon.getSetting("profile")
+    if savedProfile:
+        load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+savedProfile)
+        saveState()
+    else:
+        debug("LoadProfile: No stored profile found")
+    getMyListChangeAuthorisation()
+
 def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
