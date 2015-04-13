@@ -15,24 +15,31 @@ import xbmcaddon
 import xbmcvfs
 from resources.lib import chrome_cookies
 
+
+trace_on = False
+try:
+    pass
+    # import pydevd
+    # #pydevd.set_pm_excepthook()
+    # pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
+    # trace_on = True
+except BaseException as ex:
+    pass
+
 try:
     # Add support for newer SSL connections in requests
     # Ensure OpenSSL is installed with system package manager on linux
+    import resources
     sys.path.append(os.path.dirname(resources.lib.__file__))
-    import platform
-    if 'windows' in platform.system().lower():
-        if platform.architecture()[0] == '64bit':
-            openssl_bindir = os.path.join(os.path.dirname(resources.lib.__file__), 'bin','openssl-1.0.2a-x64_86-win64')
-        else:
-            openssl_bindir = os.path.join(os.path.dirname(resources.lib.__file__), 'bin','openssl-1.0.2a-i386-win32')
-        os.environ["PATH"] += os.pathsep + openssl_bindir
-    elif 'darwin' in platform.system().lower():
-        openssl_bindir = os.path.join(os.path.dirname(resources.lib.__file__), 'bin','openssl-1.0.2a-x86_64-darwin')
-        os.environ["PATH"] += os.pathsep + openssl_bindir
-
+    #import pyasn1
+    #import ndg
+    import resources.lib.pyOpenSSL
     import OpenSSL
-    import pyasn1
-    import ndg
+
+    # https://urllib3.readthedocs.org/en/latest/security.html#openssl-pyopenssl
+    import requests.packages.urllib3.contrib.pyopenssl
+    requests.packages.urllib3.contrib.pyopenssl.inject_into_urllib3()
+
     verify_ssl = True
 except Exception as ex:
     import traceback
@@ -104,16 +111,6 @@ debug = addon.getSetting("debug") == "true"
 country = addon.getSetting("country")
 if len(country)==0 and len(language.split("-"))>1:
     country = language.split("-")[1]
-
-trace_on = False
-try:
-    pass
-    # import pydevd
-    # #pydevd.set_pm_excepthook()
-    # pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
-    # trace_on = True
-except BaseException as ex:
-    pass
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
