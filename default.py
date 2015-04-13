@@ -543,6 +543,12 @@ def getSeriesInfo(seriesID):
         fh = xbmcvfs.File(cacheFile, 'w')
         fh.write(content)
         fh.close()
+
+    # if netflix throws exception they may still return content after the exception
+    index = content.find('{"title":')
+    if index != -1:
+        content = content[index:]
+
     return content
 
 
