@@ -33,10 +33,12 @@ try:
     import OpenSSL
     import pyasn1
     import ndg
+    verify_ssl = True
 except Exception as ex:
     import traceback
     print traceback.format_exc()
     print "ERROR importing OpenSSL handler"
+    verify_ssl = False
 
 import requests
 import HTMLParser
@@ -147,17 +149,17 @@ def load(url, post = None):
     r = ""
     try:
         if post:
-            r = session.post(url, data=post, verify=False).text
+            r = session.post(url, data=post, verify=verify_ssl).text
         else:
-            r = session.get(url, verify=False).text
+            r = session.get(url, verify=verify_ssl).text
     except AttributeError:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC Error: Cookies have been deleted. Please try again.,10000,'+icon+')')
         newSession()
         saveState()
         if post:
-            r = session.post(url, data=post, verify=False).text
+            r = session.post(url, data=post, verify=verify_ssl).text
         else:
-            r = session.get(url, verify=False).text
+            r = session.get(url, verify=verify_ssl).text
 
     return r.encode('utf-8')
 
