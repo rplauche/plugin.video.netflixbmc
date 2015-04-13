@@ -1,12 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import HTMLParser
-import urllib
-import requests
-import socket
+import os
 import sys
 import re
-import os
 import json
 import time
 import shutil
@@ -18,6 +14,34 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 from resources.lib import chrome_cookies
+
+try:
+    # Add support for newer SSL connections in requests
+    # Ensure OpenSSL is installed with system package manager on linux
+    sys.path.append(os.path.dirname(resources.lib.__file__))
+    import platform
+    if 'windows' in platform.system().lower():
+        if platform.architecture()[0] == '64bit':
+            openssl_bindir = os.path.join(os.path.dirname(resources.lib.__file__), 'bin','openssl-1.0.2a-x64_86-win64')
+        else:
+            openssl_bindir = os.path.join(os.path.dirname(resources.lib.__file__), 'bin','openssl-1.0.2a-i386-win32')
+        os.environ["PATH"] += os.pathsep + openssl_bindir
+    elif 'darwin' in platform.system().lower():
+        openssl_bindir = os.path.join(os.path.dirname(resources.lib.__file__), 'bin','openssl-1.0.2a-x86_64-darwin')
+        os.environ["PATH"] += os.pathsep + openssl_bindir
+
+    import OpenSSL
+    import pyasn1
+    import ndg
+except Exception as ex:
+    import traceback
+    print traceback.format_exc()
+    print "ERROR importing OpenSSL handler"
+
+import requests
+import HTMLParser
+import urllib
+import socket
 
 try:
     import cPickle as pickle
