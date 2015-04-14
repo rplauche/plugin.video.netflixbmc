@@ -20,8 +20,10 @@ for filename in *.egg; do
  unzip $filename -d "${filename%.*}"
  rm $filename
 done
+python __init__.py
 
-# and then add a suitable match -> path append below
+# This will print out the identifier matches on the current system
+# add a suitable identifier match -> new folder path below
 # Please do contribute added distributions back to project!
 """
 
@@ -29,31 +31,41 @@ import os
 import sys
 import platform
 
-paths = [os.path.dirname(__file__)]
+path = None
 
 identifier1 = (platform.system(), platform.architecture()[0]) + platform.python_version_tuple()[0:2]
+identifier2 = None
 
 ## Platform Identifiers
-if identifier1 == ('Darwin', '64bit', '2', '6'):
-    paths.append(os.path.join(os.path.dirname(__file__), "pyOpenSSL-0.13-py2.6-macosx-10.10-intel"))
+identifier1_matches = {
+    ('Darwin', '64bit', '2', '6')  : "pyOpenSSL-0.13-py2.6-macosx-10.10-intel",
+    ('Windows', '32bit', '2', '6') : "pyOpenSSL-0.13-py2.6-win32",
+    ('Windows', '32bit', '2', '7') : "pyOpenSSL-0.13-py2.7-win32",
+}
 
-elif identifier1 == ('Windows', '32bit', '2', '6'):
-    paths.append(os.path.join(os.path.dirname(__file__), "pyOpenSSL-0.13-py2.6-win32"))
+if identifier1 in identifier1_matches:
+    path = os.path.join(os.path.dirname(__file__), identifier1_matches[identifier1])
 
-elif identifier1 == ('Windows', '32bit', '2', '7'):
-    paths.append(os.path.join(os.path.dirname(__file__), "pyOpenSSL-0.13-py2.7-win32"))
-
-elif identifier1 == ('Linux', '32bit', '2', '7'):
+elif 'Linux' in identifier1:
     identifier2 = identifier1 + platform.libc_ver()
 
-    if identifier2 == ('Linux', '64bit', '2', '7', 'glibc', '2.4'):
-        raise NotImplementedError
-else:
-    print "OpenSSL distribution not available for your platform. \nPlease add one if possible by following instructions in top of file: " + str(__file__)
+    identifier2_matches = {
+       ('Linux', '64bit', '2', '7', 'glibc', '2.4'): "pyOpenSSL-0.13-py2.7-linux-x86_64"
+    }
 
-# Add required paths to python search path
-for p in paths:
-    if p not in sys.path:
-        sys.path.append(p)
+    if identifier2 in identifier2_matches:
+        path = os.path.join(os.path.dirname(__file__), identifier2_matches[identifier2])
+
+if not path:
+    print "OpenSSL distribution not available for your platform. \nPlease add one if possible by following instructions in top of file: " + str(__file__)
+else:
+    # Add required paths to python search path
+    if path not in sys.path:
+        sys.path.append(path)
 
 import OpenSSL
+
+if __name__ == "__main__":
+    print "identifier1 = " + str(identifier1)
+    if identifier2:
+        print "identifier2 = " + str(identifier2)
