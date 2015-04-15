@@ -26,7 +26,7 @@
   <string id="30114">Ajouter à ma liste</string>
   <string id="30115">Supprimer de ma liste</string>
   <string id="30116">Configure Control Utitlity</string>
-  <string id="30117">Show profile selection on each start</string>
+  <string id="30117">Afficher la sélection du profil à chaque démarrage</string>
   <string id="30118">Afficher les saisons</string>
   <string id="30119">ViewID (Episodes)</string>
   <string id="30120">Browse TV-Shows instead of autoplaying</string>
@@ -59,12 +59,12 @@
   <string id="30204">Avancé</string>
   <string id="30205">Debug Logging</string>
   <string id="30206">Use Browser Shell Script</string>
-  <string id="30207">Windows Settings</string>
+  <string id="30207">Paramètres Windows</string>
   <string id="30208">Linux Settings</string>
   <string id="30209">OSX Settings</string>
-  <string id="30210">Browser Settings</string>
+  <string id="30210">Paramètres du navigateur</string>
   <string id="30211">Réinitialiser</string>
   <string id="30212">Use Chrome Control Plugin</string>
-  <string id="30213">Open Plugin Settings</string>
+  <string id="30213">Ouvrir les paramètres du plugin</string>
   <string id="30214">Type de connexion SSL</string>
 </strings>
