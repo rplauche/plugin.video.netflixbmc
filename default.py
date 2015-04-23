@@ -33,8 +33,8 @@ try:
     sys.path.append(os.path.dirname(resources.lib.__file__))
     #import pyasn1
     #import ndg
-    import resources.lib.pyOpenSSL
     import OpenSSL
+    import resources.lib.pyOpenSSL
 
     # https://urllib3.readthedocs.org/en/latest/security.html#openssl-pyopenssl
     import requests.packages.urllib3.contrib.pyopenssl
@@ -209,7 +209,18 @@ def index():
         addDir(translation(30011), "", 'main', "", "movie")
         addDir(translation(30012), "", 'main', "", "tv")
         addDir(translation(30143), "", 'wiHome', "", "both")
+        if not singleProfile:
+            profileName = addon.getSetting("profileName")
+            addDir(translation(30113) + ' - [COLOR blue]' + profileName + '[/COLOR]', "", 'profileDisplayUpdate', 'DefaultAddonService.png', type, contextEnable=False)
         xbmcplugin.endOfDirectory(pluginhandle)
+
+
+def profileDisplayUpdate():
+    menuPath =  xbmc.getInfoLabel('Container.FolderPath')
+    if not showProfiles:
+        addon.setSetting("profile", None)
+        saveState()
+    xbmc.executebuiltin('Container.Update('+menuPath+')')
 
 
 def main(type):
@@ -859,24 +870,46 @@ def loadProfile():
 
 def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
+    matchType = 0
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
+    if len(match):
+        matchType = 1
     if not len(match):
         match = re.compile('"firstName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
+        if len(match):
+            matchType = 1
+    if not len(match):
+        match = re.compile('"experience":"(.+?)".+?guid":"(.+?)".+?profileName":"(.+?)"', re.DOTALL).findall(content)
+        if len(match):
+            matchType = 2
     profiles = []
     # remove any duplicated profile data found during page scrape
     match = [item for count, item in enumerate(match) if item not in match[:count]]
-    for p, t, e in match:
-        profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
-        profiles.append(profile)
-    dialog = xbmcgui.Dialog()
-    nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
-    if nr >= 0:
-        selectedProfile = profiles[nr]
+
+    if matchType == 1:
+        for p, t, e in match:
+            profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
+            profiles.append(profile)
+    elif matchType == 2:
+        for e, t, p in match:
+            profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
+            profiles.append(profile)
+
+    if matchType > 0:
+        dialog = xbmcgui.Dialog()
+        nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
+        if nr >= 0:
+            selectedProfile = profiles[nr]
+        else:
+            selectedProfile = profiles[0]
         load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+selectedProfile['token'])
         addon.setSetting("profile", selectedProfile['token'])
         addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids'] else 'false')
+        addon.setSetting("profileName", selectedProfile['name'])
         saveState()
-    getMyListChangeAuthorisation()
+        getMyListChangeAuthorisation()
+    else:
+        debug("Netflixbmc::chooseProfile: No profiles were found")
 
 def getMyListChangeAuthorisation():
     content = load(urlMain+"/WiHome")
@@ -959,7 +992,7 @@ def parameters_string_to_dict(parameters):
     return paramDict
 
 
-def addDir(name, url, mode, iconimage, type=""):
+def addDir(name, url, mode, iconimage, type="", contextEnable=True):
     name = htmlParser.unescape(name)
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&type="+str(type)+"&thumb="+urllib.quote_plus(iconimage)
     ok = True
@@ -969,10 +1002,12 @@ def addDir(name, url, mode, iconimage, type=""):
     entries = []
     if "/MyList" in url:
         entries.append((translation(30122), 'RunPlugin(plugin://plugin.video.netflixbmc/?mode=addMyListToLibrary)',))
-    if not singleProfile:
-        entries.append((translation(30110), 'RunPlugin(plugin://plugin.video.netflixbmc/?mode=chooseProfile)',))
     liz.setProperty("fanart_image", defaultFanart)
-    liz.addContextMenuItems(entries)
+    if contextEnable:
+        liz.addContextMenuItems(entries)
+    else:
+        emptyEntries = []
+        liz.addContextMenuItems(emptyEntries, replaceItems=True)
     ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=True)
     return ok
 
@@ -1283,10 +1318,11 @@ elif mode == 'addMovieToLibrary':
     addMovieToLibrary(url, name)
 elif mode == 'addSeriesToLibrary':
     addSeriesToLibrary(seriesID, name, url)
+elif mode == 'profileDisplayUpdate':
+    profileDisplayUpdate()
 else:
     index()
 
 
 if trace_on:
     pydevd.stoptrace()
-
