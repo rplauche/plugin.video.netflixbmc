@@ -33,8 +33,8 @@ try:
     sys.path.append(os.path.dirname(resources.lib.__file__))
     #import pyasn1
     #import ndg
-    import resources.lib.pyOpenSSL
     import OpenSSL
+    import resources.lib.pyOpenSSL
 
     # https://urllib3.readthedocs.org/en/latest/security.html#openssl-pyopenssl
     import requests.packages.urllib3.contrib.pyopenssl
