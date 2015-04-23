@@ -211,7 +211,7 @@ def index():
         addDir(translation(30143), "", 'wiHome', "", "both")
         if not singleProfile:
             profileName = addon.getSetting("profileName")
-            addDir(translation(30113) + ' - [COLOR blue]' + profileName + '[/COLOR]', "", 'profileDisplayUpdate', "", type, contextEnable=False)
+            addDir(translation(30113) + ' - [COLOR blue]' + profileName + '[/COLOR]', "", 'profileDisplayUpdate', 'DefaultAddonService.png', type, contextEnable=False)
         xbmcplugin.endOfDirectory(pluginhandle)
 
 
@@ -870,27 +870,46 @@ def loadProfile():
 
 def chooseProfile():
     content = load("https://www.netflix.com/ProfilesGate?nextpage=http%3A%2F%2Fwww.netflix.com%2FDefault")
+    matchType = 0
     match = re.compile('"profileName":"(.+?)".+?token":"(.+?)"', re.DOTALL).findall(content)
+    if len(match):
+        matchType = 1
     if not len(match):
         match = re.compile('"firstName":"(.+?)".+?guid":"(.+?)".+?experience":"(.+?)"', re.DOTALL).findall(content)
+        if len(match):
+            matchType = 1
+    if not len(match):
+        match = re.compile('"experience":"(.+?)".+?guid":"(.+?)".+?profileName":"(.+?)"', re.DOTALL).findall(content)
+        if len(match):
+            matchType = 2
     profiles = []
     # remove any duplicated profile data found during page scrape
     match = [item for count, item in enumerate(match) if item not in match[:count]]
-    for p, t, e in match:
-        profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
-        profiles.append(profile)
-    dialog = xbmcgui.Dialog()
-    nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
-    if nr >= 0:
-        selectedProfile = profiles[nr]
+
+    if matchType == 1:
+        for p, t, e in match:
+            profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
+            profiles.append(profile)
+    elif matchType == 2:
+        for e, t, p in match:
+            profile = {'name': unescape(p), 'token': t, 'isKids': e=='jfk'}
+            profiles.append(profile)
+
+    if matchType > 0:
+        dialog = xbmcgui.Dialog()
+        nr = dialog.select(translation(30113), [profile['name'] for profile in profiles])
+        if nr >= 0:
+            selectedProfile = profiles[nr]
+        else:
+            selectedProfile = profiles[0]
+        load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+selectedProfile['token'])
+        addon.setSetting("profile", selectedProfile['token'])
+        addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids'] else 'false')
+        addon.setSetting("profileName", selectedProfile['name'])
+        saveState()
+        getMyListChangeAuthorisation()
     else:
-        selectedProfile = profiles[0]
-    load("https://api-global.netflix.com/desktop/account/profiles/switch?switchProfileGuid="+selectedProfile['token'])
-    addon.setSetting("profile", selectedProfile['token'])
-    addon.setSetting("isKidsProfile", 'true' if selectedProfile['isKids'] else 'false')
-    addon.setSetting("profileName", selectedProfile['name'])
-    saveState()
-    getMyListChangeAuthorisation()
+        debug("Netflixbmc::chooseProfile: No profiles were found")
 
 def getMyListChangeAuthorisation():
     content = load(urlMain+"/WiHome")
