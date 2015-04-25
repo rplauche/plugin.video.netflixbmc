@@ -15,42 +15,40 @@ import xbmcaddon
 import xbmcvfs
 from resources.lib import chrome_cookies
 
-
 trace_on = False
-try:
-    pass
-    # import pydevd
-    # #pydevd.set_pm_excepthook()
-    # pydevd.settrace('192.168.0.16', port=51380, stdoutToServer=True, stderrToServer=True)
-    # trace_on = True
-except BaseException as ex:
-    pass
+addon = xbmcaddon.Addon()
 
-try:
-    # Add support for newer SSL connections in requests
-    # Ensure OpenSSL is installed with system package manager on linux
-    import resources
-    sys.path.append(os.path.dirname(resources.lib.__file__))
-    #import pyasn1
-    #import ndg
-    import resources.lib.pyOpenSSL
-    import OpenSSL
-
-    # https://urllib3.readthedocs.org/en/latest/security.html#openssl-pyopenssl
-    import requests.packages.urllib3.contrib.pyopenssl
-    requests.packages.urllib3.contrib.pyopenssl.inject_into_urllib3()
-
-    verify_ssl = True
-except Exception as ex:
-    import traceback
-    print traceback.format_exc()
-    print "ERROR importing OpenSSL handler"
-    verify_ssl = False
+if addon.getSetting("sslEnable") == "true":
+    try:
+        # Add support for newer SSL connections in requests
+        # Ensure OpenSSL is installed with system package manager on linux
+        import resources
+        sys.path.append(os.path.dirname(resources.lib.__file__))
+        import resources.lib.pyOpenSSL
+        import OpenSSL
+        # https://urllib3.readthedocs.org/en/latest/security.html#openssl-pyopenssl
+        import requests.packages.urllib3.contrib.pyopenssl
+        requests.packages.urllib3.contrib.pyopenssl.inject_into_urllib3()
+        verify_ssl = True
+    except Exception as ex:
+        import traceback
+        print traceback.format_exc()
+        print "ERROR importing OpenSSL handler"
+        verify_ssl = False
 
 import requests
 import HTMLParser
 import urllib
 import socket
+
+if addon.getSetting("sslEnable") == "false":
+    verify_ssl = False
+    print "SSL is Disabled"
+    #supress warnings
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    from requests.packages.urllib3.exceptions import InsecurePlatformWarning
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 
 try:
     import cPickle as pickle
@@ -61,7 +59,6 @@ socket.setdefaulttimeout(40)
 pluginhandle = int(sys.argv[1])
 
 htmlParser = HTMLParser.HTMLParser()
-addon = xbmcaddon.Addon()
 addonID = addon.getAddonInfo('id')
 osWin = xbmc.getCondVisibility('system.platform.windows')
 osLinux = xbmc.getCondVisibility('system.platform.linux')
