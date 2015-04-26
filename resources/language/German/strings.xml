@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
   <string id="30001">Nächste Seite</string>
   <string id="30002">Meine Liste</string>
@@ -68,4 +68,6 @@
   <string id="30212">Verwenden Chrome Control Plugin</string>
   <string id="30213">Öffnen Plugin-Einstellungen</string>
   <string id="30214">SSL -Anschlusstyp</string>
+ <!--Apologies for any translation problems, below was done with google-->
+  <string id="30215">Mit der erweiterten SSL</string>
 </strings>

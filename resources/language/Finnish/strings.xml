@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
   <string id="30001">Seuraava sivu</string>
   <string id="30002">Oma lista</string>
@@ -67,4 +67,6 @@
   <string id="30212">Käytä Chrome Control Plugin -lisäosaa</string>
   <string id="30213">Avaa lisäosan asetukset</string>
   <string id="30214">SSL Yhteystyyppi</string>
+ <!--Apologies for any translation problems, below was done with google-->
+  <string id="30215">Käytä Kehittynyttä SSL</string>
 </strings>
