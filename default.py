@@ -58,6 +58,9 @@ except ImportError:
 socket.setdefaulttimeout(40)
 pluginhandle = int(sys.argv[1])
 
+while (addon.getSetting("username") == "" or addon.getSetting("password") == ""):
+    addon.openSettings()
+
 htmlParser = HTMLParser.HTMLParser()
 addonID = addon.getAddonInfo('id')
 osWin = xbmc.getCondVisibility('system.platform.windows')
@@ -139,7 +142,6 @@ def unescape(s):
 
 def load(url, post = None):
     debug("URL: " + url)
-
     r = ""
     try:
         if post:
@@ -154,7 +156,6 @@ def load(url, post = None):
             r = session.post(url, data=post, verify=verify_ssl).text
         else:
             r = session.get(url, verify=verify_ssl).text
-
     return r.encode('utf-8')
 
 def saveState():
@@ -189,11 +190,6 @@ if os.path.exists(sessionFile):
     content = fh.read()
     fh.close()
     session = pickle.loads(content)
-
-while (username == "" or password == ""):
-    addon.openSettings()
-    username = addon.getSetting("username")
-    password = addon.getSetting("password")
 
 if not addon.getSetting("html5MessageShown"):
     dialog = xbmcgui.Dialog()
@@ -410,7 +406,10 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     match = re.compile('src=".+?">.*?<.*?>(.+?)<', re.DOTALL).findall(videoDetails)
     desc = ""
     if match:
-        desc = htmlParser.unescape(match[0].decode("utf-8"))
+        descTemp = match[0].decode("utf-8", 'ignore')
+        #replace all embedded unicode in unicode (Norwegian problem)
+        descTemp = descTemp.replace('u2013', u'\u2013').replace('u2026', u'\u2026')
+        desc = htmlParser.unescape(descTemp)
     match = re.compile('Director:</dt><dd>(.+?)<', re.DOTALL).findall(videoDetails)
     director = ""
     if match:
@@ -837,7 +836,6 @@ def login():
                 # always overwrite the country code, to cater for switching regions
                 debug("Setting Country: " + match[0])
                 addon.setSetting("country", match[0])
-                
             saveState()
         if not addon.getSetting("profile") and not singleProfile:
             chooseProfile()
@@ -968,8 +966,8 @@ def addSeriesToLibrary(seriesID, seriesTitle, season, singleUpdate=True):
 def playTrailer(title):
     try:
         content = load("http://gdata.youtube.com/feeds/api/videos?vq="+title.strip().replace(" ", "+")+"+trailer&racy=include&orderby=relevance")
-        match = re.compile('<id>http://gdata.youtube.com/feeds/api/videos/(.+?)</id>', re.DOTALL).findall(content.split('<entry>')[1])
-        xbmc.Player().play("plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=" + match[0])
+        match = re.compile('<id>http://gdata.youtube.com/feeds/api/videos/(.+?)</id>', re.DOTALL).findall(content.split('<entry>')[2])
+        xbmc.Player().play("plugin://plugin.video.youtube/play/?video_id=" + match[0])
     except:
         pass
 
