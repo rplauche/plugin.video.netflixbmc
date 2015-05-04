@@ -370,7 +370,7 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     match = re.compile('<span class="mpaaRating.*?>(.+?)<', re.DOTALL).findall(videoDetails)
     mpaa = ""
     if match:
-        mpaa = match[0]
+        mpaa = match[0].strip()
     match = re.compile('<span class="duration.*?>(.+?)<', re.DOTALL).findall(videoDetails)
     duration = ""
     if match:
@@ -416,9 +416,9 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
     genre = ""
     if match:
         genre = match[0]
-    match = re.compile('<span class="rating.*?>(.+?)<', re.DOTALL).findall(videoDetails)
+    match = re.compile('<span class="rating">(.+?)<', re.DOTALL).findall(videoDetails)
     rating = ""
-    if rating:
+    if match:
         rating = match[0]
     title = htmlParser.unescape(title.decode("utf-8"))
     nextMode = "playVideoMain"
@@ -1017,7 +1017,7 @@ def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", 
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&thumb="+urllib.quote_plus(iconimage)
     ok = True
     liz = xbmcgui.ListItem(name, iconImage="DefaultTVShows.png", thumbnailImage=iconimage)
-    liz.setInfo(type="video", infoLabels={"title": name, "plot": desc, "duration": duration, "year": year, "mpaa": mpaa, "director": director, "genre": genre, "rating": rating})
+    liz.setInfo(type="video", infoLabels={"title": name, "plot": desc, "duration": duration, "year": year, "mpaa": mpaa, "director": director, "genre": genre, "rating": float(rating)})
     if os.path.exists(fanartFile):
         liz.setProperty("fanart_image", fanartFile)
     elif os.path.exists(coverFile):
@@ -1054,7 +1054,7 @@ def addVideoDirR(name, url, mode, iconimage, videoType="", desc="", duration="",
     u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&thumb="+urllib.quote_plus(iconimage)
     ok = True
     liz = xbmcgui.ListItem(name, iconImage="DefaultTVShows.png", thumbnailImage=iconimage)
-    liz.setInfo(type="video", infoLabels={"title": name, "plot": desc, "duration": duration, "year": year, "mpaa": mpaa, "director": director, "genre": genre, "rating": rating})
+    liz.setInfo(type="video", infoLabels={"title": name, "plot": desc, "duration": duration, "year": year, "mpaa": mpaa, "director": director, "genre": genre, "rating": float(rating)})
     if os.path.exists(fanartFile):
         liz.setProperty("fanart_image", fanartFile)
     elif os.path.exists(coverFile):
