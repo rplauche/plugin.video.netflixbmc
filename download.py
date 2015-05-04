@@ -15,9 +15,35 @@ def download(videoID, title, year):
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
     coverFileNone = os.path.join(cacheFolderCoversTMDB, filenameNone)
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
-    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()
-    match = re.compile('"poster_path":"(.+?)"', re.DOTALL).findall(content)
+    if videoType == "tv":
+        content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&first_air_date_year="+urllib.quote_plus(year)+"&language=en").read()
+        resultCount = re.compile('"total_results":(.+?)').findall(content)
+        if resultCount[0] == str(0):
+            #try again without the date as sometimes Netflix get the year wrong
+            content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&language=en").read()
+            resultCount = re.compile('"total_results":(.+?)').findall(content)
+            if resultCount[0] == str(0):
+                if '(' in title:
+                    title = title[:title.find('(')]
+                    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&first_air_date_year="+urllib.quote_plus(year)+"&language=en").read()    
+                elif ':' in title:
+                    title = title[:title.find(':')]
+                    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&first_air_date_year="+urllib.quote_plus(year)+"&language=en").read()
+    else:
+        content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()
+        resultCount = re.compile('"total_results":(.+?)').findall(content)
+        if resultCount[0] == str(0):
+            content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&language=en").read()
+            resultCount = re.compile('"total_results":(.+?)').findall(content)
+            if resultCount[0] == str(0):
+                if '(' in title:
+                    title = title[:title.find('(')]
+                    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&language=en").read()
+                elif ':' in title:
+                    title = title[:title.find(':')]
+                    content = opener.open("http://api.themoviedb.org/3/search/"+videoType+"?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()
 
+    match = re.compile('"poster_path":"(.+?)"', re.DOTALL).findall(content)
     # maybe its a mini-series (TMDb calls them movies)
     if not match and videoType == "tv":
         content = opener.open("http://api.themoviedb.org/3/search/movie?api_key="+apiKey+"&query="+urllib.quote_plus(title.strip())+"&year="+urllib.quote_plus(year)+"&language=en").read()

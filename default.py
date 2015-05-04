@@ -392,8 +392,6 @@ def listVideo(videoID, title, thumbUrl, tvshowIsEpisode, hideMovies, type):
         titleTemp = title
         if " - " in titleTemp:
             titleTemp = titleTemp[titleTemp.find(" - ")+3:]
-        if ": " in titleTemp:
-            titleTemp = titleTemp[:titleTemp.find(": ")]
         if "-" in yearTemp:
             yearTemp = yearTemp.split("-")[0]
         filename = clean_filename(videoID)+".jpg"
@@ -488,7 +486,7 @@ def listEpisodes(seriesID, season):
             if episodeSeason == season:
                 episodeID = str(item["episodeId"])
                 episodeNr = str(item["episode"])
-                episodeTitle = item["title"].encode('utf-8')
+                episodeTitle = (episodeNr + ".  " + item["title"]).encode('utf-8')
                 duration = item["runtime"]
                 bookmarkPosition = item["bookmarkPosition"]
                 playcount=0
@@ -1008,6 +1006,8 @@ def addDir(name, url, mode, iconimage, type="", contextEnable=True):
 
 
 def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
+    if duration:
+        duration = str(int(duration) * 60)
     name = name.encode("utf-8")
     filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
@@ -1043,6 +1043,8 @@ def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", 
 
 
 def addVideoDirR(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
+    if duration:
+        duration = str(int(duration) * 60)
     name = name.encode("utf-8")
     filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
@@ -1096,6 +1098,8 @@ def addSeasonDir(name, url, mode, iconimage, seriesName, seriesID):
 
 
 def addEpisodeDir(name, url, mode, iconimage, desc="", duration="", season="", episodeNr="", seriesID="", playcount=""):
+    if duration:
+        duration = str(int(duration) * 60)
     filename = clean_filename(seriesID)+".jpg"
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
