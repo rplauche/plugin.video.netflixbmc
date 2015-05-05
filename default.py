@@ -798,7 +798,21 @@ def removeFromQueue(id):
     else:
          debug("Attempted to removeFromQueue without valid authMyList")
 
+
+def displayLoginProgress(progressWindow, value, message):
+    progressWindow.update( value, "", message, "" )
+    if progressWindow.iscanceled():
+        return False
+    else:
+        return True
+
+
 def login():
+    #setup login progress display
+    loginProgress = xbmcgui.DialogProgress()
+    loginProgress.create('NETFLIXBMC', str(translation(30216)) + '...')
+    displayLoginProgress(loginProgress, 25, str(translation(30217)))
+
     session.cookies.clear()
     content = load(urlMain+"/Login")
     match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
@@ -819,22 +833,23 @@ def login():
                         "RememberMe":"on"
                         }
             #content = load("https://signup.netflix.com/Login", "authURL="+urllib.quote_plus(authUrl)+"&email="+urllib.quote_plus(username)+"&password="+urllib.quote_plus(password)+"&RememberMe=on")
+            displayLoginProgress(loginProgress, 50, str(translation(30218)))
             content = load("https://signup.netflix.com/Login", postdata)
             if 'id="page-LOGIN"' in content:
                 # Login Failed
                 xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30127))+',15000,'+icon+')')
                 return False
-            
             match = re.compile('"LOCALE":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
             if match and not addon.getSetting("language"):
                 addon.setSetting("language", match[0])
-            
             match = re.compile('"COUNTRY":"(.+?)"', re.DOTALL|re.IGNORECASE).findall(content)
             if match:
                 # always overwrite the country code, to cater for switching regions
                 debug("Setting Country: " + match[0])
                 addon.setSetting("country", match[0])
             saveState()
+            displayLoginProgress(loginProgress, 75, str(translation(30219)))
+
         if not addon.getSetting("profile") and not singleProfile:
             chooseProfile()
         elif not singleProfile and showProfiles:
@@ -843,9 +858,16 @@ def login():
             loadProfile()
         else:
             getMyListChangeAuthorisation()
+        if loginProgress:
+            if not displayLoginProgress(loginProgress, 100, str(translation(30220))):
+                return False
+            xbmc.sleep(500)
+            loginProgress.close()
         return True
     else:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30126))+',10000,'+icon+')')
+        if loginProgress:
+            loginProgress.close()
         return False
 
 def debug(message):
