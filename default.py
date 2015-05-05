@@ -246,6 +246,7 @@ def wiHome(type):
 def listVideos(url, type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
+    pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(url)
     #content = load(url) # Terrible... currently first call doesn't have the content, it requires two calls....
@@ -297,6 +298,7 @@ def listVideos(url, type):
 def listSliderVideos(sliderID, type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
+    pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(urlMain+"/WiHome")
     if not 'id="page-LOGIN"' in content:
@@ -334,6 +336,7 @@ def listSliderVideos(sliderID, type):
 def listSearchVideos(url, type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
+    pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(url)
     content = json.loads(content)
@@ -506,6 +509,7 @@ def listEpisodes(seriesID, season):
 def listViewingActivity(type):
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('NetfliXBMC', translation(30142)+"...")
+    pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(urlMain+"/WiViewingActivity")
     count = 0
