@@ -18,6 +18,7 @@
     <category label="30204">
     	<setting id="debug" type="bool" label="30205" default="false"/>
         <setting id="libraryPath" type="folder" label="30138" default="special://profile/addon_data/plugin.video.netflixbmc/library"/>
+        <setting id="sslEnable" type="bool" label="30215" default="true"/>
         <setting id="sslSetting" type="labelenum" label="30214" values="Auto|SSLv2|SSLv23|SSLv3|TLSv1" default="TLSv1"/>
 
         <setting type="lsep" label="30210" /> <!-- Browser Settings -->
