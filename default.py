@@ -493,7 +493,7 @@ def listEpisodes(seriesID, season):
                 duration = item["runtime"]
                 bookmarkPosition = item["bookmarkPosition"]
                 playcount=0
-                if (float(bookmarkPosition)/float(duration))>=0.9:
+                if (duration>0 and float(bookmarkPosition)/float(duration))>=0.9:
                     playcount=1
                 desc = item["synopsis"].encode('utf-8')
                 try:
