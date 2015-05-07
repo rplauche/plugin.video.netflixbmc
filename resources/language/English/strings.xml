@@ -68,4 +68,9 @@
   <string id="30213">Open Plugin Settings</string>
   <string id="30214">SSL Connection Type</string>
   <string id="30215">Use Advanced SSL</string>
+  <string id="30216">Talking to Netflix</string>
+  <string id="30217">Starting Login</string>
+  <string id="30218">Sending login Details</string>
+  <string id="30219">Loading Profile</string>
+  <string id="30220">Complete</string>
 </strings>
