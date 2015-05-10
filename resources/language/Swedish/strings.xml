@@ -67,11 +67,10 @@
   <string id="30212">Använd Chrome Control Plugin</string>
   <string id="30213">Öppna tilläggsinställningar</string>
   <string id="30214">Anslutningskryptering</string>
- <!--Apologies for any translation problems, below was done with google-->
-  <string id="30215">Använd Avancerade SSL</string>
-  <string id="30216">Att prata med Netflix</string>
-  <string id="30217">Utgångs inloggning</string>
-  <string id="30218">Skicka inloggningsuppgifter</string>
-  <string id="30219">Lastning profil</string>
-  <string id="30220">Komplett</string>
+  <string id="30215">Avancerad SSL</string>
+  <string id="30216">Kommunicerar med Netflix</string>
+  <string id="30217">Påbörjar inloggning</string>
+  <string id="30218">Skickar inloggningsuppgifter</string>
+  <string id="30219">Laddar profil</string>
+  <string id="30220">Klar</string>
 </strings>
