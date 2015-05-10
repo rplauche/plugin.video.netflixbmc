@@ -67,11 +67,10 @@
   <string id="30212">Käytä Chrome Control Plugin -lisäosaa</string>
   <string id="30213">Avaa lisäosan asetukset</string>
   <string id="30214">SSL Yhteystyyppi</string>
- <!--Apologies for any translation problems, below was done with google-->
-  <string id="30215">Käytä Kehittynyttä SSL</string>
-  <string id="30216">Puhuu Netflix</string>
-  <string id="30217">Alkaen kirjautuminen</string>
-  <string id="30218">Lähettäminen kirjautumistiedot</string>
-  <string id="30219">Kuormitusprofiili</string>
-  <string id="30220">Täydellinen</string>
+  <string id="30215">Käytä kehittynyttä SSL:ää</string>
+  <string id="30216">Keskustellaan Netflixin kanssa</string>
+  <string id="30217">Aloitetaan kirjautuminen</string>
+  <string id="30218">Lähetetään kirjautumistiedot</string>
+  <string id="30219">Ladataan profiilia</string>
+  <string id="30220">Valmis</string>
 </strings>
