@@ -1225,7 +1225,7 @@ class window(xbmcgui.WindowXMLDialog):
             doClose = False
             key=None
             if action in [ACTION_SHOW_GUI, ACTION_STOP, ACTION_PARENT_DIR, ACTION_PREVIOUS_MENU, KEY_BUTTON_BACK]:
-                key="alt+F4"
+                key="control+shift+q"
                 doClose=True
             elif action in [ ACTION_SELECT_ITEM, ACTION_PLAYER_PLAY, ACTION_PAUSE ]:
                 key="space"
