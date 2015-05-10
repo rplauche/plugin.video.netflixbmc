@@ -1233,16 +1233,12 @@ class window(xbmcgui.WindowXMLDialog):
                 key="Left"
             elif action==ACTION_MOVE_RIGHT:
                 key="Right"
-            elif action==ACTION_MOVE_UP:
-                key="Up"
-            elif action==ACTION_MOVE_DOWN:
-                key="Down"
             elif action==ACTION_SHOW_INFO:
                 key="question"
             elif action==ACTION_VOLUME_UP:
-                key="bracketright"
+                key="Up"
             elif action==ACTION_VOLUME_DOWN:
-                key="bracketleft"
+                key="Down"
             elif action==ACTION_MUTE:
                 key="M"
             elif action==ACTION_CONTEXT_MENU:
