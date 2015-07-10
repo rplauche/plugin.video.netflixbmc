@@ -1294,8 +1294,7 @@ seriesID = urllib.unquote_plus(params.get('seriesID', ''))
 type = urllib.unquote_plus(params.get('type', ''))
 
 #if the addon is requested from the homewindow, assume the content is retrieved as widget so disable progress bar and forcedviews
-runAsWidget = False
-runAsWidget = xbmc.getCondVisibility("window.isactive(home)")
+runAsWidget = urllib.unquote_plus(params.get('widget', '')) == 'true'
 
 if mode == 'main':
     main(type)
