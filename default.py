@@ -1032,8 +1032,8 @@ def addDir(name, url, mode, iconimage, type="", contextEnable=True):
 
 
 def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
-    if duration:
-        duration = str(int(duration) * 60)
+##    if duration:
+##        duration = str(int(duration) * 60)
     name = name.encode("utf-8")
     filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
@@ -1069,8 +1069,8 @@ def addVideoDir(name, url, mode, iconimage, videoType="", desc="", duration="", 
 
 
 def addVideoDirR(name, url, mode, iconimage, videoType="", desc="", duration="", year="", mpaa="", director="", genre="", rating=""):
-    if duration:
-        duration = str(int(duration) * 60)
+##    if duration:
+##        duration = str(int(duration) * 60)
     name = name.encode("utf-8")
     filename = clean_filename(url)+".jpg"
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
@@ -1124,8 +1124,8 @@ def addSeasonDir(name, url, mode, iconimage, seriesName, seriesID):
 
 
 def addEpisodeDir(name, url, mode, iconimage, desc="", duration="", season="", episodeNr="", seriesID="", playcount=""):
-    if duration:
-        duration = str(int(duration) * 60)
+##    if duration:
+##        duration = str(int(duration) * 60)
     filename = clean_filename(seriesID)+".jpg"
     fanartFile = os.path.join(cacheFolderFanartTMDB, filename)
     coverFile = os.path.join(cacheFolderCoversTMDB, filename)
