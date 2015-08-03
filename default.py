@@ -243,10 +243,11 @@ def wiHome(type):
     xbmcplugin.endOfDirectory(pluginhandle)
 
 
-def listVideos(url, type):
-    pDialog = xbmcgui.DialogProgress()
-    pDialog.create('NetfliXBMC', translation(30142)+"...")
-    pDialog.update( 0, translation(30142)+"...")
+def listVideos(url, type, runAsWidget=False):
+    if not runAsWidget:
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('NetfliXBMC', translation(30142)+"...")
+        pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(url)
     #content = load(url) # Terrible... currently first call doesn't have the content, it requires two calls....
@@ -266,7 +267,8 @@ def listVideos(url, type):
             if not match: match = re.compile('WiPlayer\?movieid=([0-9]+?)&', re.DOTALL).findall(content)
             i = 1
             for videoID in match:
-                pDialog.update(i*100/len(match), translation(30142)+"...")
+                if not runAsWidget:
+                    pDialog.update(i*100/len(match), translation(30142)+"...")
                 listVideo(videoID, "", "", False, False, type)
                 i+=1
             match1 = re.compile('&pn=(.+?)&', re.DOTALL).findall(url)
@@ -287,7 +289,7 @@ def listVideos(url, type):
                 currentTo = str(int(currentFrom)+49)
                 nextTo = str(int(currentFrom)+99)
                 addDir(translation(30001), url.replace("&from="+currentFrom+"&", "&from="+nextFrom+"&").replace("&to="+currentTo+"&", "&to="+nextTo+"&"), 'listVideos', "", type)
-            if forceView:
+            if forceView and not runAsWidget:
                 xbmc.executebuiltin('Container.SetViewMode('+viewIdVideos+')')
         xbmcplugin.endOfDirectory(pluginhandle)
     else:
@@ -295,10 +297,11 @@ def listVideos(url, type):
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30127))+',15000,'+icon+')')
 
 
-def listSliderVideos(sliderID, type):
-    pDialog = xbmcgui.DialogProgress()
-    pDialog.create('NetfliXBMC', translation(30142)+"...")
-    pDialog.update( 0, translation(30142)+"...")
+def listSliderVideos(sliderID, type, runAsWidget=False):
+    if not runAsWidget:
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('NetfliXBMC', translation(30142)+"...")
+        pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(urlMain+"/WiHome")
     if not 'id="page-LOGIN"' in content:
@@ -322,10 +325,11 @@ def listSliderVideos(sliderID, type):
                     match = re.compile('<span id="dbs(.+?)_', re.DOTALL).findall(entry)
                     i = 1
                     for videoID in match:
-                        pDialog.update(i*100/(len(match)+10), translation(30142)+"...")
+                        if not runAsWidget:
+                            pDialog.update(i*100/(len(match)+10), translation(30142)+"...")
                         listVideo(videoID, "", "", False, False, type)
                         i+=1
-            if forceView:
+            if forceView and not runAsWidget:
                 xbmc.executebuiltin('Container.SetViewMode('+viewIdVideos+')')
             xbmcplugin.endOfDirectory(pluginhandle)
     else:
@@ -333,20 +337,22 @@ def listSliderVideos(sliderID, type):
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30127))+',15000,'+icon+')')
 
 
-def listSearchVideos(url, type):
-    pDialog = xbmcgui.DialogProgress()
-    pDialog.create('NetfliXBMC', translation(30142)+"...")
-    pDialog.update( 0, translation(30142)+"...")
+def listSearchVideos(url, type, runAsWidget=False):
+    if not runAsWidget:
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('NetfliXBMC', translation(30142)+"...")
+        pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(url)
     content = json.loads(content)
     i = 1
     if "galleryVideos" in content:
         for item in content["galleryVideos"]["items"]:
-            pDialog.update(i*100/len(content["galleryVideos"]["items"]), translation(30142)+"...")
+            if not runAsWidget:
+                pDialog.update(i*100/len(content["galleryVideos"]["items"]), translation(30142)+"...")
             listVideo(str(item["id"]), "", "", False, False, type)
             i+=1
-        if forceView:
+        if forceView and not runAsWidget:
             xbmc.executebuiltin('Container.SetViewMode('+viewIdVideos+')')
         xbmcplugin.endOfDirectory(pluginhandle)
     else:
@@ -506,10 +512,11 @@ def listEpisodes(seriesID, season):
     xbmcplugin.endOfDirectory(pluginhandle)
 
 
-def listViewingActivity(type):
-    pDialog = xbmcgui.DialogProgress()
-    pDialog.create('NetfliXBMC', translation(30142)+"...")
-    pDialog.update( 0, translation(30142)+"...")
+def listViewingActivity(type, runAsWidget=False):
+    if not runAsWidget:
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('NetfliXBMC', translation(30142)+"...")
+        pDialog.update( 0, translation(30142)+"...")
     xbmcplugin.setContent(pluginhandle, "movies")
     content = load(urlMain+"/WiViewingActivity")
     count = 0
@@ -518,7 +525,8 @@ def listViewingActivity(type):
     #spl = content.split('')
     for i in range(1, len(spl), 1):
         entry = spl[i]
-        pDialog.update((count+1)*100/len(spl), translation(30142)+"...")
+        if not runAsWidget:
+            pDialog.update((count+1)*100/len(spl), translation(30142)+"...")
         matchId = re.compile('data-movieid="(.*?)"', re.DOTALL).findall(entry)
         if matchId:
             videoID = matchId[0]
@@ -542,7 +550,7 @@ def listViewingActivity(type):
                 count += 1
             if count == 40:
                 break
-    if forceView:
+    if forceView and not runAsWidget:
         xbmc.executebuiltin('Container.SetViewMode('+viewIdActivity+')')
     xbmcplugin.endOfDirectory(pluginhandle)
 
@@ -1285,16 +1293,19 @@ season = urllib.unquote_plus(params.get('season', ''))
 seriesID = urllib.unquote_plus(params.get('seriesID', ''))
 type = urllib.unquote_plus(params.get('type', ''))
 
+#if the addon is requested from the homewindow, assume the content is retrieved as widget so disable progress bar and forcedviews
+runAsWidget = urllib.unquote_plus(params.get('widget', '')) == 'true'
+
 if mode == 'main':
     main(type)
 elif mode == 'wiHome':
     wiHome(type)
 elif mode == 'listVideos':
-    listVideos(url, type)
+    listVideos(url, type, runAsWidget)
 elif mode == 'listSliderVideos':
-    listSliderVideos(url, type)
+    listSliderVideos(url, type, runAsWidget)
 elif mode == 'listSearchVideos':
-    listSearchVideos(url, type)
+    listSearchVideos(url, type, runAsWidget)
 elif mode == 'addToQueue':
     addToQueue(url)
 elif mode == 'removeFromQueue':
@@ -1314,7 +1325,7 @@ elif mode == 'listGenres':
 elif mode == 'listTvGenres':
     listTvGenres(type)
 elif mode == 'listViewingActivity':
-    listViewingActivity(type)
+    listViewingActivity(type, runAsWidget)
 elif mode == 'listSeasons':
     listSeasons(name, url, thumb)
 elif mode == 'listEpisodes':
