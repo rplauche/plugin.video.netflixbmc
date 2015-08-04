@@ -720,8 +720,6 @@ def playVideoMain(id):
             #xbmc.executebuiltin("RunPlugin(plugin://plugin.program.chrome.launcher/?url="+urllib.quote_plus(url)+"&mode=showSite&kiosk="+kiosk+")")
         if useUtility:
             subprocess.Popen('"'+utilityPath+'"', shell=False)
-    elif osAndroid:
-        xbmc.executebuiltin('XBMC.StartAndroidActivity("com.android.browser","","","' + url + '")')
 
     myWindow = window('window.xml', addon.getAddonInfo('path'), 'default',)
     myWindow.doModal()
@@ -1288,7 +1286,7 @@ class window(xbmcgui.WindowXMLDialog):
             else:
                 self.close()
         elif osAndroid:
-            pass #I don't know if we can do this on android
+            pass #I don't know if we can do this on android, We also may not need to as the netflix app should respond to remotes
 
 
 params = parameters_string_to_dict(sys.argv[2])
