@@ -3,14 +3,14 @@
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.requests" version="2.4.3"/>
-        <import addon="plugin.program.chrome.launcher" version="1.1.2"/>
+        <import addon="plugin.program.chrome.launcher" version="1.1.2" optional="true"/>
         <import addon="script.module.pydevd" version="2.1.0" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <platform>windx osx linux</platform>
+        <platform>windx osx linux android</platform>
         <summary lang="en">NetfliXBMC - Unofficial Netflix Add-on (Win/OSX/Linux)</summary>
         <language></language>
         <description lang="en">NetfliXBMC - Unofficial Netflix Add-on (Win/OSX/Linux)</description>
