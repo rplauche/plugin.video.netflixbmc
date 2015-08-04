@@ -684,6 +684,8 @@ def playVideoMain(id):
             subprocess.Popen('cliclick kp:arrow-up', shell=True)
         except:
             pass
+    elif osAndroid:
+        xbmc.executebuiltin('XBMC.StartAndroidActivity("","android.intent.action.VIEW","","' + urlMain+'/watch/' + id + '")')
     elif osLinux:
         if linuxUseShellScript:
             xbmc.executebuiltin('LIRC.Stop')
@@ -881,7 +883,7 @@ def login():
         return True
     else:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30126))+',10000,'+icon+')')
-        if loginProgress:
+        if debuginProgress:
             loginProgress.close()
         return False
 
