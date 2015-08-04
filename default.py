@@ -881,7 +881,7 @@ def login():
         return True
     else:
         xbmc.executebuiltin('XBMC.Notification(NetfliXBMC:,'+str(translation(30126))+',10000,'+icon+')')
-        if debuginProgress:
+        if loginProgress:
             loginProgress.close()
         return False
 
