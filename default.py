@@ -66,6 +66,7 @@ addonID = addon.getAddonInfo('id')
 osWin = xbmc.getCondVisibility('system.platform.windows')
 osLinux = xbmc.getCondVisibility('system.platform.linux')
 osOSX = xbmc.getCondVisibility('system.platform.osx')
+osAndroid = xbmc.getCondVisibility('system.platform.android')
 addonDir = xbmc.translatePath(addon.getAddonInfo('path'))
 defaultFanart = os.path.join(addonDir ,'fanart.png')
 addonUserDataFolder = xbmc.translatePath("special://profile/addon_data/"+addonID)
@@ -683,6 +684,8 @@ def playVideoMain(id):
             subprocess.Popen('cliclick kp:arrow-up', shell=True)
         except:
             pass
+    elif osAndroid:
+        xbmc.executebuiltin('XBMC.StartAndroidActivity("","android.intent.action.VIEW","","' + urlMain+'/watch/' + id + '")')
     elif osLinux:
         if linuxUseShellScript:
             xbmc.executebuiltin('LIRC.Stop')
@@ -1282,6 +1285,8 @@ class window(xbmcgui.WindowXMLDialog):
                     subprocess.Popen('cliclick kp:arrow-down', shell=True)
             else:
                 self.close()
+        elif osAndroid:
+            pass #I don't know if we can do this on android, We also may not need to as the netflix app should respond to remotes
 
 
 params = parameters_string_to_dict(sys.argv[2])
