@@ -14,6 +14,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 from resources.lib import chrome_cookies
+from bs4 import BeautifulSoup
 
 trace_on = False
 addon = xbmcaddon.Addon()
@@ -450,16 +451,15 @@ def listGenres(type, videoType):
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
     if isKidsProfile:
         type = 'KidsAltGenre'
-    content = load(urlMain+"/WiHome")
-    match = re.compile('/'+type+'\\?agid=(.+?)">(.+?)<', re.DOTALL).findall(content)
-    # A number of categories (especially in the Kids genres) have duplicate entires and a lot of whitespice; create a stripped unique set
-    unique_match = set((k[0].strip(), k[1].strip()) for k in match)
-    for genreID, title in unique_match:
-        if not genreID=="83":
-            if isKidsProfile:
-                addDir(title, urlMain+"/"+type+"?agid="+genreID+"&pn=1&np=1&actionMethod=json", 'listVideos', "", videoType)
-            else:
-                addDir(title, urlMain+"/"+type+"?agid="+genreID, 'listVideos', "", videoType)
+    content = load(urlMain+"/browse")
+
+    soup = BeautifulSoup(content, "html.parser")
+
+    # @TODO: handle Kids Profile
+    for item in soup.select(".browse-menu-genre"):
+        if not item.string == "TV Shows":
+            addDir(item.string, urlMain+item['data-href'], 'listVideos', "", videoType)
+
     xbmcplugin.endOfDirectory(pluginhandle)
 
 
@@ -469,6 +469,7 @@ def listTvGenres(videoType):
     content = content[content.find('id="subGenres_menu"'):]
     content = content[:content.find('</div>')]
     match = re.compile('<li ><a href=".+?/WiGenre\\?agid=(.+?)&.+?"><span>(.+?)<', re.DOTALL).findall(content)
+
     for genreID, title in match:
         addDir(title, urlMain+"/WiGenre?agid="+genreID, 'listVideos', "", videoType)
     xbmcplugin.endOfDirectory(pluginhandle)
@@ -689,11 +690,11 @@ def playVideoMain(id):
     elif osLinux:
         if linuxUseShellScript:
             xbmc.executebuiltin('LIRC.Stop')
-            
+
             call = '"'+browserScript+'" "'+url+'"';
             debug("Browser Call: " + call)
             subprocess.call(call, shell=True)
-            
+
             xbmc.executebuiltin('LIRC.Start')
         else:
             launchChrome(url)
