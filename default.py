@@ -134,7 +134,7 @@ def newSession():
     s = requests.Session()
     s.mount('https://', SSLAdapter())
     s.headers.update({
-        'User-Agent': 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20130331 Firefox/21.0',
+        'User-Agent': 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36',
     })
     return s
 session = newSession()
